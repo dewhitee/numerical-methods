@@ -68,3 +68,14 @@ test_equations = [
 ]
 
 gauss_seidel(test_equations, ['x','y','z'])
+
+
+# 1, 3, 4 var systems testing
+
+var_1_equations = [
+    lambda x1, x2, x3, x4: 1/(2 - x1 - 2*x2 - x3),
+    lambda x1, x2, x3, x4: 1/3*(-1 * x1 - 5*x2 - x3),
+    lambda x1, x2, x3, x4: 1/(-7)*(-2 * x1 + x3)
+]
+
+gauss_seidel(var_1_equations, ['x1', 'x2', 'x3', 'x4'])
