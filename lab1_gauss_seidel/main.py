@@ -21,7 +21,7 @@ def gauss_seidel(equations: list, vars: list):
     """
     count = 1
 
-    # Reading tolerable error
+    # Reading tolerable error (required accuracy)
     e = float(input('Enter tolerable error: '))
 
     # Implementation of Gauss Seidel Iteration
@@ -34,13 +34,22 @@ def gauss_seidel(equations: list, vars: list):
 
     while condition:
         e_list = []
+        
+        # Calculating all variables
         for i, eq in enumerate(equations):
+            # Calculating the i-th lambda of equations list
             new_value = eq(*vars_values)
+
+            # Adding i-th error to the e_list
             e_list.append(abs(vars_values[i] - new_value))
+
+            # Set current i-th vars_values variable to it's newly calculated new_value
             vars_values[i] = new_value
 
         print(count, *["%0.4f" % elem for elem in vars_values], sep="\t")
         count += 1
+
+        # Checking if all current errors are greater than required error e
         condition = check_error_rate(e_list, e)
 
     print('\nSolution')
