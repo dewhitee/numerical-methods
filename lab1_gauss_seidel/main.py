@@ -35,9 +35,9 @@ def gauss_seidel(equations: list, vars: list):
     while condition:
         e_list = []
         for i, eq in enumerate(equations):
-            v1 = eq(*vars_values)
-            e_list.append(abs(vars_values[i] - v1))
-            vars_values[i] = v1
+            new_value = eq(*vars_values)
+            e_list.append(abs(vars_values[i] - new_value))
+            vars_values[i] = new_value
 
         print(count, *["%0.4f" % elem for elem in vars_values], sep="\t")
         count += 1
