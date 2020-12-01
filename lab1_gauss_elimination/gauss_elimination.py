@@ -73,3 +73,11 @@ test_matrix = [
 ]
 
 gauss_elimination(test_matrix, ['x1', 'x2', 'x3'])
+
+test_matrix_2 = [
+    [2, 3, -1, 7],
+    [1, -1, 6, 14],
+    [6, -2, 1, 11]
+]
+
+gauss_elimination(test_matrix_2, ['x1', 'x2', 'x3'])
