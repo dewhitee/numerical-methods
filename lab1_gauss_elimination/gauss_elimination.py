@@ -11,8 +11,8 @@ def gauss_elimination(matrix: list, vars: list):
     print('Length of the matrix (n):', matrix_len)
 
     print('Matrix before pivotisation (initial):\n')
-    for (var, mat) in zip(vars, matrix):
-        print(var, *mat, sep='\t')
+    for (var, row) in zip(vars, matrix):
+        print(var, *row, sep='\t')
 
     # Find the pivot element - we need to put it as the first row in the matrix
     for i in range(matrix_len):
@@ -37,8 +37,8 @@ def gauss_elimination(matrix: list, vars: list):
                 matrix[k][j] -= coefficient * matrix[i][j]
 
     print('\nMatrix after gauss elimination:\n')
-    for (var, mat) in zip(vars, matrix):
-        print(var, *["%0.4f" % elem for elem in mat], sep='\t  ')
+    for (var, row) in zip(vars, matrix):
+        print(var, *["%0.4f" % elem for elem in row], sep='\t  ')
 
     # List of variables values (x, y, z, ...)
     vars_values = [0] * matrix_len
