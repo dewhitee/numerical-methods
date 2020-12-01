@@ -18,6 +18,7 @@
 ######## det(A) - детерминант (определитель) (прос)
 det(A)=0    если    cond(A) = ∞ (бессконечность)
 
-![alt text](https://media.discordapp.net/attachments/578480014740422676/783339265580597278/unknown.png)
+![alt text](https://wikimedia.org/api/rest_v1/media/math/render/svg/5b2e40d390e1d26039aabee44c7d1d86c8755232)
+![alt text](https://wikimedia.org/api/rest_v1/media/math/render/svg/a891ca1b518ba39ff21a458c74f9cc74bcefb18c)
 
 ### Норма матрицы - ||A||=max||aj||
