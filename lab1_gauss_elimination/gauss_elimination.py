@@ -23,16 +23,17 @@ def gauss_elimination(matrix: list, vars: list):
                     matrix[i][j], matrix[k][j] = matrix[k][j], matrix[i][j]
 
     print('\nMatrix after pivotisation:\n')
-    for (var, mat) in zip(vars, matrix):
-        print(var, *mat, sep='\t')
+    for (var, row) in zip(vars, matrix):
+        print(var, *row, sep='\t')
 
     # Main Gauss Elimination loop
-    # Forward elimination -- Straight step
+    # Forward elimination -- Straight step (Nulling the bottom-left corner)
     for i in range(matrix_len - 1):
         for k in range(i + 1, matrix_len):
             coefficient = matrix[k][i] / matrix[i][i] # Coefficient
     
-            # Make the elements below the pivot elements equal to zero or eliminate the variables
+            # Make the elements below the pivot elements equal to zero 
+            # or eliminate the variables
             for j in range(0, matrix_len + 1):
                 matrix[k][j] -= coefficient * matrix[i][j]
 
@@ -41,17 +42,18 @@ def gauss_elimination(matrix: list, vars: list):
         print(var, *["%0.4f" % elem for elem in row], sep='\t  ')
 
     # List of variables values (x, y, z, ...)
+    # Initializing all variables values with zero
     vars_values = [0] * matrix_len
 
-    # Back substitution -- Reversed step
+    # Back substitution -- Reversed step (Nulling upper-right corner)
     for i in range(matrix_len - 1, -1, -1):
         # Make the variable to be calculated equal to the rhs of the
         # last equation
         vars_values[i] = matrix[i][matrix_len]
 
         for j in range(i + 1, matrix_len):
-            # Subtracting all the lhs values except the coefficient of the variable
-            # whose value is being calculated
+            # Subtracting all the lhs values except the coefficient 
+            # of the variable whose value is being calculated
             if j != i:
                 vars_values[i] -= matrix[i][j] * vars_values[j]
 
