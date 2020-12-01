@@ -22,3 +22,5 @@ det(A)=0    если    cond(A) = ∞ (бессконечность)
 ![alt text](https://wikimedia.org/api/rest_v1/media/math/render/svg/a891ca1b518ba39ff21a458c74f9cc74bcefb18c)
 
 ### Норма матрицы - ||A||=max||aj||
+### Euclidean norm:
+![alt text](https://media.discordapp.net/attachments/578480014740422676/783348864052363284/unknown.png)
