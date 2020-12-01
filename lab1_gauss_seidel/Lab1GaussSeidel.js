@@ -3,6 +3,7 @@ function gaussSeidel (a,b,e) {
   let x = new Array();
   let stop = false;
   let itter = 0;
+  let eRes = [];
   //Ввод данных
   //x = [x1,x2 ...]
   //b = [b1,b2 ...]
@@ -24,25 +25,22 @@ function gaussSeidel (a,b,e) {
       xNew[i] = 0;
       for (let j = 0; j<a[i].length; j++) {
         if ((i != j) && (j>i)) {
-          xNew[i] += a[i][j] * x[j];
+          xNew[i] += -a[i][j] * x[j];
         }
         if ((i != j) && (j<i)) {
-          xNew[i] += a[i][j] * xNew[j];
+          xNew[i] += -a[i][j] * xNew[j];
         }
-        //console.log(xNew[i]);
       }
       xNew[i] += b[i];
-      //console.log("x = " + xNew[i]);
+      xNew[i] *= 1/a[i][i];
 
     }
-    console.log("xNew = " + xNew);
 
     //проверка e
     stop = false;
-    for (let i = 0; i<x.lenght;i++) {
+    for (let i = 0; i<x.length;i++) {
 
-      console.log(Math.abs(xNew[i] - x[i]));
-      if (Math.abs(xNew[i] - x[i]) < e) {
+      if (Math.abs(xNew[i] - x[i]) <= e) {
         stop = true;
       } else {
         stop = false;
@@ -50,8 +48,21 @@ function gaussSeidel (a,b,e) {
       }
     }
     //выход из while
-    if (stop || (itter>99)) {
+    if (stop) {
+      for (let i = 0; i<x.length;i++) {
+        eRes.push((xNew[i] - x[i]).toFixed(6));
+        xNew[i] = xNew[i].toFixed(6);
+      }
       break;
+    }
+
+    //выход если достигли лимит итераций
+    if (itter>99) {
+      for (let i = 0; i<x.length;i++) {
+        eRes.push((xNew[i] - x[i]).toFixed(6));
+        xNew[i] = xNew[i].toFixed(6);
+      }
+      return "\n---------\n\nДостигнут лимит итераций\ne = " + e + "\nXi+1 - Xi = ["+ eRes +"]\nX =  [" + xNew + "]\n\n---------";
     }
 
     //xNew становятьося x
@@ -61,7 +72,7 @@ function gaussSeidel (a,b,e) {
     itter++;
 
   }
-  console.log("xNew = " + xNew);
+  //console.log("X = [" + xNew + "]");
 
-  return "x = { " + xNew + " }";
+  return "\n---------\n\ne = " + e + "\nXi+1 - Xi = ["+ eRes +"]\nX =  [" + xNew + "]\n\n---------";
 }
