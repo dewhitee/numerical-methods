@@ -5,7 +5,7 @@
 #
 # ...
 
-def gauss_elimination(matrix: list, vars: list, e: float):
+def gauss_elimination(matrix: list, vars: list):
 
     matrix_len = len(matrix)
     print('Length of the matrix (n):', matrix_len)
@@ -32,7 +32,7 @@ def gauss_elimination(matrix: list, vars: list, e: float):
         for k in range(i + 1, matrix_len):
             coefficient = matrix[k][i] / matrix[i][i] # Coefficient
     
-            # Make the elements below the pivot elements equal to zero or eliminate the variable
+            # Make the elements below the pivot elements equal to zero or eliminate the variables
             for j in range(0, matrix_len + 1):
                 matrix[k][j] -= coefficient * matrix[i][j]
 
@@ -70,4 +70,4 @@ test_matrix = [
     [144, 12, 1, 279.2],
 ]
 
-gauss_elimination(test_matrix, ['x1', 'x2', 'x3'], 0.001)
+gauss_elimination(test_matrix, ['x1', 'x2', 'x3'])
