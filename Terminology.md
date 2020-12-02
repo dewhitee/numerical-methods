@@ -2,6 +2,7 @@
 1)
 
 2)
+![alt text](Images/Method Gaussa Zeidela.png)
 
 3)
 
