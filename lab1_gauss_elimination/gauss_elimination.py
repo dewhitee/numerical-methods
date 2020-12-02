@@ -5,9 +5,9 @@
 #
 # ...
 
-def gauss_elimination(matrix: list, vars: list):
+def gauss_elimination(matrix: list, vars: list) -> list:
     """
-    
+    returns list of solution variables X
     """
 
     matrix_len = len(matrix)
@@ -68,6 +68,8 @@ def gauss_elimination(matrix: list, vars: list):
     for (var, val) in zip(vars, vars_values):
         print(var, '= %0.4f' %(val))
 
+    return vars_values
+
 
 test_matrix = [
     [25, 5, 1, 106.8],
@@ -75,7 +77,7 @@ test_matrix = [
     [144, 12, 1, 279.2],
 ]
 
-gauss_elimination(test_matrix, ['x1', 'x2', 'x3'])
+#gauss_elimination(test_matrix, ['x1', 'x2', 'x3'])
 
 test_matrix_2 = [
     [2, 3, -1, 7],
@@ -83,4 +85,4 @@ test_matrix_2 = [
     [6, -2, 1, 11]
 ]
 
-gauss_elimination(test_matrix_2, ['x1', 'x2', 'x3'])
+#gauss_elimination(test_matrix_2, ['x1', 'x2', 'x3'])

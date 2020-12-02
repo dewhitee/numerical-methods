@@ -12,7 +12,7 @@
 # 9. Print value of x1, y1, z1 and so on
 # 10. Stop
 
-def gauss_seidel(equations: list, vars: list, e: float):
+def gauss_seidel(equations: list, vars: list, e: float) -> list:
     """ 
     equations -- list of lambda equations with any count of arguments.
     Example: [lambda x, y: x + y, lambda x, y: x - y]
@@ -22,6 +22,8 @@ def gauss_seidel(equations: list, vars: list, e: float):
 
     e -- tolerable error
     Example: 0.001
+
+    returns list of solution variables X
     """
     iteration = 1
 
@@ -60,6 +62,9 @@ def gauss_seidel(equations: list, vars: list, e: float):
     for (var, val) in zip(vars, vars_values):
         print(var,'= %0.3f' %(val))
 
+    return vars_values
+
+
 def check_error_rate(e_list: list, e):
     return all([current_e > e for current_e in e_list])
 
@@ -71,7 +76,7 @@ test_equations = [
     lambda x, y, z: (25 - 2*x + 3*y) / 20
 ]
 
-gauss_seidel(test_equations, ['x','y','z'], 0.001)
+#gauss_seidel(test_equations, ['x','y','z'], 0.001)
 
 test_equations_2 = [
     lambda x1, x2, x3, x4: 1/20.9*(21.70 - 1.2*x2 - 2.1*x3 - 0.9*x4),
@@ -80,7 +85,7 @@ test_equations_2 = [
     lambda x1, x2, x3, x4: 1/32.1*(49.72 - 0.9*x1 - 2.5*x2 - 1.3*x3)
 ]
 
-gauss_seidel(test_equations_2, ['x1', 'x2', 'x3', 'x4'], 0.001)
+#gauss_seidel(test_equations_2, ['x1', 'x2', 'x3', 'x4'], 0.001)
 
 
 # 1, 3, 4 var systems testing
@@ -91,4 +96,4 @@ var_1_equations = [
     lambda x1, x2, x3, x4: 1/(-7)*(-2 * x1 + x3)
 ]
 
-gauss_seidel(var_1_equations, ['x1', 'x2', 'x3', 'x4'], 0.001)
+#gauss_seidel(var_1_equations, ['x1', 'x2', 'x3', 'x4'], 0.001)
