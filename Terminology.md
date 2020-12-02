@@ -2,7 +2,7 @@
 1)
 
 2)
-![alt text](Images/Method Gaussa Zeidela.png)
+![alt text](https://github.com/dewhitee/numerical-methods/blob/main/Images/Gauss%20i%20vedusij%20element.png)
 
 3)
 
