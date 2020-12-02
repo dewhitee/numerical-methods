@@ -6,6 +6,9 @@
 # ...
 
 def gauss_elimination(matrix: list, vars: list):
+    """
+    
+    """
 
     matrix_len = len(matrix)
     print('Length of the matrix (n):', matrix_len)
