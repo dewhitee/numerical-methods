@@ -1,7 +1,11 @@
 # 1 ЛАБ
-1)
+1) Гаусс с ведущим элементом 
 
-2)
+![alt text](https://github.com/dewhitee/numerical-methods/blob/main/Images/Gauss%20i%20vedusij%20element.png)
+
+2)Гаусс-Зейдель
+
+![alt text](https://github.com/dewhitee/numerical-methods/blob/main/Images/Method%20Gaussa%20Zeidela.png)
 
 3)
 
@@ -26,4 +30,14 @@ det(A)=0    если    cond(A) = ∞ (бессконечность)
 ![alt text](https://wikimedia.org/api/rest_v1/media/math/render/svg/a891ca1b518ba39ff21a458c74f9cc74bcefb18c)
 
 ### Норма матрицы - ||A||=max||aj||
+Матрицу можно рассматривать как вектор векторов, поэтому принято считать нормой матрицы - максимальную норму его столбцов.
 ![alt text](https://media.discordapp.net/attachments/578480014740422676/783348864052363284/unknown.png)
+
+### Эксперементальное определение: 
+![alt text](https://github.com/dewhitee/numerical-methods/blob/main/Images/Эксперементальный%20метод.png)
+
+
+### Виды матриц:
+
+![alt text](https://github.com/dewhitee/numerical-methods/blob/main/Images/Oboznacenie%20matrici%201.png)
+![alt text](https://github.com/dewhitee/numerical-methods/blob/main/Images/Oboznacenie%20matrici%202.png)
