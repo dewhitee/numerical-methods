@@ -1,9 +1,8 @@
 # 1 ЛАБ
-1)
-
-2)
+1) Гаусс с ведущим элементом 
 ![alt text](https://github.com/dewhitee/numerical-methods/blob/main/Images/Gauss%20i%20vedusij%20element.png)
-
+2) Гаусс-Зейдель
+![alt text](https://github.com/dewhitee/numerical-methods/blob/main/Images/Method%20Gaussa%20Zeidela.png)
 3)
 
 Показывает точность потенциальной обусловленности 
