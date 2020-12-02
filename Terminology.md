@@ -31,3 +31,8 @@ det(A)=0    если    cond(A) = ∞ (бессконечность)
 
 ### Норма матрицы - ||A||=max||aj||
 ![alt text](https://media.discordapp.net/attachments/578480014740422676/783348864052363284/unknown.png)
+
+### Виды матриц:
+
+![alt text](https://github.com/dewhitee/numerical-methods/blob/main/Images/Oboznacenie%20matrici%201.png)
+![alt text](https://github.com/dewhitee/numerical-methods/blob/main/Images/Oboznacenie%20matrici%202.png)
