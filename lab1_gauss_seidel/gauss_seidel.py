@@ -12,7 +12,7 @@
 # 9. Print value of x1, y1, z1 and so on
 # 10. Stop
 
-def gauss_seidel(equations: list, vars: list, e: float) -> list:
+def gauss_seidel(equations: list, vars: list, e: float, print_only_results: bool = False, matrix_name: str = "") -> list:
     """ 
     equations -- list of lambda equations with any count of arguments.
     Example: [lambda x, y: x + y, lambda x, y: x - y]
@@ -31,8 +31,9 @@ def gauss_seidel(equations: list, vars: list, e: float) -> list:
     #e = float(input('Enter tolerable error: '))
 
     # Implementation of Gauss Seidel Iteration
-    print('\n-------------------------------------Gauss Seidel')
-    print('Iter', *vars, sep = "\t")
+    print('\n-------------------------------------Gauss Seidel - ' + matrix_name)
+    if not print_only_results:
+        print('Iter', *vars, sep = "\t")
 
     condition = True
 
@@ -52,8 +53,8 @@ def gauss_seidel(equations: list, vars: list, e: float) -> list:
 
             # Set current i-th vars_values variable to it's newly calculated new_value
             vars_values[i] = new_value
-
-        print(iteration, *["%0.4f" % elem for elem in vars_values], sep="\t")
+        if not print_only_results:
+            print(iteration, *["%0.4f" % elem for elem in vars_values], sep="\t")
         iteration += 1
 
         # Checking if all current errors are greater than required error e

@@ -5,18 +5,19 @@
 #
 # ...
 
-def gauss_elimination(matrix: list, vars: list) -> list:
+def gauss_elimination(matrix: list, vars: list, print_only_results: bool = False, matrix_name: str = "") -> list:
     """
     returns list of solution variables X
     """
 
     matrix_len = len(matrix)
-    print('\n-------------------------------------Gauss Elimination')
-    print('Length of the matrix (n):', matrix_len)
+    print('\n-------------------------------------Gauss Elimination - ' + matrix_name)
+    if not print_only_results:
+        print('Length of the matrix (n):', matrix_len)
 
-    print('Matrix before pivotisation (initial):\n')
-    for (var, row) in zip(vars, matrix):
-        print(var, *["%0.4f" % elem for elem in row], sep='\t')
+        print('Matrix before pivotisation (initial):\n')
+        for (var, row) in zip(vars, matrix):
+            print(var, *["%0.4f" % elem for elem in row], sep='\t')
 
     # Find the pivot element - we need to put it as the first row in the matrix
     for i in range(matrix_len):
@@ -26,9 +27,10 @@ def gauss_elimination(matrix: list, vars: list) -> list:
                     # Swapping elements
                     matrix[i][j], matrix[k][j] = matrix[k][j], matrix[i][j]
 
-    print('\nMatrix after pivotisation:\n')
-    for (var, row) in zip(vars, matrix):
-        print(var, *["%0.4f" % elem for elem in row], sep='\t')
+    if not print_only_results:
+        print('\nMatrix after pivotisation:\n')
+        for (var, row) in zip(vars, matrix):
+            print(var, *["%0.4f" % elem for elem in row], sep='\t')
 
     # Main Gauss Elimination loop
     # Forward elimination -- Straight step (Nulling the bottom-left corner)
@@ -41,9 +43,10 @@ def gauss_elimination(matrix: list, vars: list) -> list:
             for j in range(0, matrix_len + 1):
                 matrix[k][j] -= coefficient * matrix[i][j]
 
-    print('\nMatrix after gauss elimination:\n')
-    for (var, row) in zip(vars, matrix):
-        print(var, *["%0.4f" % elem for elem in row], sep='\t  ')
+    if not print_only_results:
+        print('\nMatrix after gauss elimination:\n')
+        for (var, row) in zip(vars, matrix):
+            print(var, *["%0.4f" % elem for elem in row], sep='\t  ')
 
     # List of variables values (x, y, z, ...)
     # Initializing all variables values with zero

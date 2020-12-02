@@ -18,10 +18,9 @@ test_1_matrix = [
 test_1_vars = ['x1', 'x2', 'x3', 'x4']
 
 # -----
-mh.solve_with_gauss_elimination(test_1_matrix, test_1_vars)
+mh.solve_with_gauss_elimination(test_1_matrix, test_1_vars, True, "Initial matrix")
 
 # -----
-mh.solve_with_gauss_seidel(test_1_matrix, test_1_equations, test_1_vars, 0.0001)
+mh.solve_with_gauss_seidel(test_1_matrix, test_1_equations, test_1_vars, 0.0001, True, "Matrix with B + deltaB")
 
-print(mh.get_matrix_determinant([[1, 2], [3, 4]]))
-print(mh.get_matrix_determinant(mh.get_matrixA(test_1_matrix)))
+#print(mh.get_matrix_determinant(mh.get_matrixA(test_1_matrix)))

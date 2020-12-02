@@ -118,6 +118,13 @@ def check_condition_number(matrix: list, vectorX: list, deltaX: list) -> bool:
     print(condA, ">=", (deltaX_norm / vectorX_norm) * (vectorB_norm / deltaB_norm))
     condition = condA >= (deltaX_norm / vectorX_norm) * (vectorB_norm / deltaB_norm)
     print("Condition returned", condition)
+    print("Condition number of matrix Cond(A) =", condA)
+    if condA < 10:
+        print("Cond(A) of the matrix falls into 1-10 range. This means that the results of this matrix calculation are adequate.")
+    elif condA < 1000:
+        print("Cond(A) of the matrix falls into 10-1000 range. This means that the results of this matrix calculation CAN BE INADEQUATE.")
+    elif condA > 1000:
+        print("Cond(A) of the matrix falls into 1000-infinity range. This means that the results of this matrix calculation ARE INADEQUATE.")
     return condition
 
 def get_deltaB(matrix: list) -> list:
@@ -172,31 +179,70 @@ def X_print(vectorX: list, vars: list):
         print(var, '= %0.4f' % (val))
 
 
-def solve_with_gauss_elimination(matrix: list, vars: list):
+def solve_with_gauss_elimination(matrix: list, vars: list, print_only_results: bool = False, matrix_name: str = ""):
     """ Solves the specified matrix using the Gauss Elimination
     """
-    vectorX = ge.gauss_elimination(matrix, vars)
-    summary(matrix, vars, vectorX)
+    vectorX = ge.gauss_elimination(matrix, vars, print_only_results, matrix_name)
+    summary_data = summary(matrix, vars, vectorX, print_only_results, matrix_name)
+    summary_gauss_elimination(summary_data)
 
-def solve_with_gauss_seidel(matrix: list, equations: list, vars: list, e: float):
+def solve_with_gauss_seidel(matrix: list, equations: list, vars: list, e: float, print_only_results: bool = False, matrix_name: str = ""):
     """ Solve the specified equations using the Gauss Seidel
     """
-    vectorX = gs.gauss_seidel(equations, vars, e)
-    summary(matrix, vars, vectorX)
+    vectorX = gs.gauss_seidel(equations, vars, e, print_only_results, matrix_name)
+    summary_data = summary(matrix, vars, vectorX, print_only_results, matrix_name)
+    summary_data.add_equations(equations)
+    summary_gauss_seidel(summary_data)
 
-def summary(matrix: list, vars: list, vectorX: list):
+class SummaryData:
+    def __init__(self, matrix: list, adjusted_matrix: list, vars: list, X: list, AX: list, 
+    B: list, condA: float, deltaB: list, print_only_results: bool = False, matrix_name: str = ""):
+        self.matrix = matrix
+        self.adjusted_matrix = adjusted_matrix
+        self.vars = vars
+        self.X = X
+        self.AX = AX
+        self.B = B
+        self.condA = condA
+        self.deltaB = deltaB
+        self.print_only_results = print_only_results
+        self.matrix_name = matrix_name
+
+    def add_equations(self, equations: list):
+        self.equations = equations
+
+def summary(matrix: list, vars: list, vectorX: list, print_only_results: bool = False, matrix_name: str = "") -> SummaryData:
     """ Summarizes the data available after solving the matrix
     """
-    show_A_B(matrix)
+    if not print_only_results:
+        show_A_B(matrix)
     AX = get_matrixAX(matrix, vectorX)
     B = get_vectorB_unpacked(matrix)
-    show_AX_B(matrix, vectorX)
+    if not print_only_results:
+        show_AX_B(matrix, vectorX)
     condA = get_matrix_cond(get_matrixA(matrix))
     print("\nCondition number Cond(A) of this matrix is =", condA)
     deltaB = get_deltaB(matrix)
     print("\nDeltaB vector:", deltaB)
-    modified_matrix = append_vectorB(matrix, array(B) + array(deltaB))
-    full_print(modified_matrix, vars, 'Modified matrix')
-    deltaX = ge.gauss_elimination(modified_matrix, vars)
-    print("DeltaX vector = ", deltaX)
-    check_condition_number(matrix, vectorX, deltaX)
+    adjusted_matrix = append_vectorB(matrix, array(B) + array(deltaB))
+    if not print_only_results:
+        full_print(adjusted_matrix, vars, 'Modified (adjusted) matrix')
+
+    return SummaryData(matrix, adjusted_matrix, vars, vectorX, AX, B, condA, deltaB, print_only_results, matrix_name)
+
+    #deltaX = ge.gauss_elimination(modified_matrix, vars, print_only_results, matrix_name)
+    #if not print_only_results:
+    #    print("DeltaX vector = ", deltaX)
+    #check_condition_number(matrix, vectorX, deltaX)
+
+def summary_gauss_elimination(data: SummaryData):
+    deltaX = ge.gauss_elimination(data.adjusted_matrix, data.vars, data.print_only_results, data.matrix_name)
+    if not data.print_only_results:
+        print("DeltaX vector = ", deltaX)
+    check_condition_number(data.matrix, data.X, deltaX)
+
+def summary_gauss_seidel(data: SummaryData):
+    deltaX = gs.gauss_seidel(data.equations, data.vars, data.print_only_results, data.matrix_name)
+    if not data.print_only_results:
+        print("DeltaX vector = ", deltaX)
+    check_condition_number(data.matrix, data.X, deltaX)
