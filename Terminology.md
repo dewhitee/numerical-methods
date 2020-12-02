@@ -33,6 +33,10 @@ det(A)=0    если    cond(A) = ∞ (бессконечность)
 Матрицу можно рассматривать как вектор векторов, поэтому принято считать нормой матрицы - максимальную норму его столбцов.
 ![alt text](https://media.discordapp.net/attachments/578480014740422676/783348864052363284/unknown.png)
 
+### Эксперементальный способ: 
+![alt text](https://github.com/dewhitee/numerical-methods/blob/main/Images/Эксперементальный%20метод.png)
+
+
 ### Виды матриц:
 
 ![alt text](https://github.com/dewhitee/numerical-methods/blob/main/Images/Oboznacenie%20matrici%201.png)
