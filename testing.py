@@ -1,7 +1,4 @@
 import lab1_gauss_elimination.gauss_elimination as ge
-import matrix_cond as cond
-import matrix_norm as norm
-import matrix_inverse as inverse
 import matrix_helpers as mh
 import numpy as np
 from numpy import array
@@ -19,7 +16,7 @@ matrix_0 = [
 ]
 #print(matrix_0)
 
-matrix_0_inversed = inverse.matrix_inverse(matrix_0)
+matrix_0_inversed = mh.get_matrix_inversed(matrix_0)
 #print(matrix_0_inversed)
 
 #print("matrix_0_norm = ", norm.matrix_norm(matrix_0))
@@ -47,7 +44,7 @@ mh.show_A_B(matrix_1)
 #print("A = ", mh.get_matrixA(matrix_1))
 
 # -- AX = B
-matrix_1_AX = np.multiply(mh.get_matrixA(matrix_1), matrix_1_vectorX)
+matrix_1_AX = mh.get_matrixAX(matrix_1, matrix_1_vectorX)
 matrix_1_B = mh.get_vectorB_unpacked(matrix_1)
 #print("AX = B;\n", mh.sum_matrix_to_vector(matrix_1_AX), "=", matrix_1_B) # == true
 
@@ -55,7 +52,7 @@ mh.show_AX_B(matrix_1, matrix_1_vectorX)
 
 # Log(Cond(A)) == number of decimals of accuracy that are lost
 # -- Theoretical condition number:
-matrix_1_cond = cond.matrix_cond(mh.get_matrixA(matrix_1))
+matrix_1_cond = mh.get_matrix_cond(mh.get_matrixA(matrix_1))
 print("\nmatrix_1_cond =", matrix_1_cond)
 
 # -- Experimental condition number:
