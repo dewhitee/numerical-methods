@@ -31,7 +31,8 @@ def gauss_seidel(equations: list, vars: list, e: float) -> list:
     #e = float(input('Enter tolerable error: '))
 
     # Implementation of Gauss Seidel Iteration
-    print('\nIter', *vars, sep = "\t")
+    print('\n-------------------------------------Gauss Seidel')
+    print('Iter', *vars, sep = "\t")
 
     condition = True
 
@@ -61,6 +62,8 @@ def gauss_seidel(equations: list, vars: list, e: float) -> list:
     print('\nSolution:')
     for (var, val) in zip(vars, vars_values):
         print(var,'= %0.3f' %(val))
+
+    print('-------------------------------------\n')
 
     return vars_values
 
