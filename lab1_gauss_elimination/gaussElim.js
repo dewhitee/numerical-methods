@@ -1,10 +1,8 @@
-function gaussMain(a,b) {
+function gaussElim(a,b) {
   let xResult = [];
   let stop = false;
   let positionMain;
   let mainElement;
-  //console.log("A = " + a);
-  //console.log("B = " + b);
 
   for (let m = 0;m<a.length; m++) {
     positionMain = mainElemntPosition(a,m);
@@ -13,8 +11,6 @@ function gaussMain(a,b) {
     b = swapRowB(b,m,positionMain);
     b = divBOnMain(b,a,mainElement,m);
     a = divAOnMain(a,mainElement,m);
-    //console.log("A = " + a);
-    //console.log("B = " + b);
   }
 
   xResult = findX(a,b);
@@ -108,6 +104,7 @@ function findX(a,b) {
       }
     }
     x[i] /= a[i][i];
+    x[i] = x[i].toFixed(6);
 
   }
   return x;
