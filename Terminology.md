@@ -1,3 +1,5 @@
+![all labworks](https://media.discordapp.net/attachments/578480014740422676/783811352182652938/unknown.png)
+
 # 1 ЛАБ
 1) Гаусс с ведущим элементом 
 
