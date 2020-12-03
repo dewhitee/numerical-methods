@@ -23,6 +23,8 @@ def gauss_seidel(equations: list, vars: list, e: float, print_only_results: bool
     e -- tolerable error
     Example: 0.001
 
+    matrix -- the whole matrix (AB)
+
     Note: you can also pass the matrix instead of equations
 
     returns list of solution variables X

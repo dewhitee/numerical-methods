@@ -8,7 +8,7 @@ import copy
 # ...
 
 def gauss_elimination(matrix: list, vars: list, print_only_results: bool = False, matrix_name: str = "") -> list:
-    """ Warning: modifies input matrix
+    """
     returns list of solution variables X
     """
 

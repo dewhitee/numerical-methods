@@ -239,11 +239,6 @@ def summary(matrix: list, vars: list, vectorX: list, print_only_results: bool = 
 
     return SummaryData(matrix, adjusted_matrix, vars, vectorX, AX, B, condA, deltaB, print_only_results, matrix_name)
 
-    #deltaX = ge.gauss_elimination(modified_matrix, vars, print_only_results, matrix_name)
-    #if not print_only_results:
-    #    print("DeltaX vector = ", deltaX)
-    #check_condition_number(matrix, vectorX, deltaX)
-
 def summary_gauss_elimination(data: SummaryData):
     deltaX = ge.gauss_elimination(data.adjusted_matrix, data.vars, data.print_only_results, data.matrix_name + " with B + deltaB")
     if not data.print_only_results:
