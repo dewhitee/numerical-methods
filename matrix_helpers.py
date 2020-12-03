@@ -186,12 +186,15 @@ def solve_with_gauss_elimination(matrix: list, vars: list, print_only_results: b
     summary_data = summary(matrix, vars, vectorX, print_only_results, matrix_name)
     summary_gauss_elimination(summary_data)
 
-def solve_with_gauss_seidel(matrix: list, equations: list, vars: list, e: float, print_only_results: bool = False, matrix_name: str = ""):
+def solve_with_gauss_seidel(matrix: list, equations: list, vars: list, e: float, print_only_results: bool = False, 
+matrix_name: str = "", use_matrix: bool = False):
     """ Solve the specified equations using the Gauss Seidel
     """
-    vectorX = gs.gauss_seidel(equations, vars, e, print_only_results, matrix_name)
+    vectorX = gs.gauss_seidel(equations, vars, e, print_only_results, matrix_name, matrix if use_matrix else None)
     summary_data = summary(matrix, vars, vectorX, print_only_results, matrix_name)
     summary_data.add_equations(equations)
+    summary_data.add_errors_vec(e)
+    summary_data.set_use_matrix(use_matrix)
     summary_gauss_seidel(summary_data)
 
 class SummaryData:
@@ -210,6 +213,12 @@ class SummaryData:
 
     def add_equations(self, equations: list):
         self.equations = equations
+
+    def add_errors_vec(self, e: list):
+        self.e = e
+
+    def set_use_matrix(self, use_matrix: bool):
+        self.use_matrix = use_matrix
 
 def summary(matrix: list, vars: list, vectorX: list, print_only_results: bool = False, matrix_name: str = "") -> SummaryData:
     """ Summarizes the data available after solving the matrix
@@ -236,13 +245,14 @@ def summary(matrix: list, vars: list, vectorX: list, print_only_results: bool = 
     #check_condition_number(matrix, vectorX, deltaX)
 
 def summary_gauss_elimination(data: SummaryData):
-    deltaX = ge.gauss_elimination(data.adjusted_matrix, data.vars, data.print_only_results, data.matrix_name)
+    deltaX = ge.gauss_elimination(data.adjusted_matrix, data.vars, data.print_only_results, data.matrix_name + " with B + deltaB")
     if not data.print_only_results:
         print("DeltaX vector = ", deltaX)
     check_condition_number(data.matrix, data.X, deltaX)
 
 def summary_gauss_seidel(data: SummaryData):
-    deltaX = gs.gauss_seidel(data.equations, data.vars, data.print_only_results, data.matrix_name)
+    deltaX = gs.gauss_seidel(data.equations, data.vars, data.e, data.print_only_results, 
+                             data.matrix_name + " with B + deltaB", data.adjusted_matrix if data.use_matrix else None)
     if not data.print_only_results:
         print("DeltaX vector = ", deltaX)
     check_condition_number(data.matrix, data.X, deltaX)

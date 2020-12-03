@@ -12,7 +12,7 @@
 # 9. Print value of x1, y1, z1 and so on
 # 10. Stop
 
-def gauss_seidel(equations: list, vars: list, e: float, print_only_results: bool = False, matrix_name: str = "") -> list:
+def gauss_seidel(equations: list, vars: list, e: float, print_only_results: bool = False, matrix_name: str = "", matrix: list = None) -> list:
     """ 
     equations -- list of lambda equations with any count of arguments.
     Example: [lambda x, y: x + y, lambda x, y: x - y]
@@ -23,36 +23,41 @@ def gauss_seidel(equations: list, vars: list, e: float, print_only_results: bool
     e -- tolerable error
     Example: 0.001
 
+    Note: you can also pass the matrix instead of equations
+
     returns list of solution variables X
     """
-    iteration = 1
 
     # Reading tolerable error (required accuracy)
     #e = float(input('Enter tolerable error: '))
 
     # Implementation of Gauss Seidel Iteration
     print('\n-------------------------------------Gauss Seidel - ' + matrix_name)
+    print('Using equations list...') if matrix is None else print ('Using matrix...')
+    print('With accuracy of ' + str(e) + '\n')
     if not print_only_results:
         print('Iter', *vars, sep = "\t")
 
     condition = True
 
-    # Initializing all variables values with zero
-    vars_values = [0] * len(equations)
+    # Initializing all variables values with zero if using equations
+    # or set each X as B if using matrix, as the first approximation
+    vars_values = [0] * len(equations) if matrix is None else [row[-1] for row in matrix]
+
+    if not print_only_results:
+        print(0, *["%0.4f" % elem for elem in vars_values], sep="\t")
+
+    iteration = 1
 
     while condition:
         e_list = []
         
         # Calculating all variables
-        for i, eq in enumerate(equations):
-            # Calculating the i-th lambda of equations list
-            new_value = eq(*vars_values)
+        if matrix is None:
+            iterate_equations(equations, e_list, vars_values)
+        else:
+            iterate_matrix(matrix, e_list, vars_values)
 
-            # Adding i-th error to the e_list
-            e_list.append(abs(vars_values[i] - new_value))
-
-            # Set current i-th vars_values variable to it's newly calculated new_value
-            vars_values[i] = new_value
         if not print_only_results:
             print(iteration, *["%0.4f" % elem for elem in vars_values], sep="\t")
         iteration += 1
@@ -68,6 +73,37 @@ def gauss_seidel(equations: list, vars: list, e: float, print_only_results: bool
 
     return vars_values
 
+def iterate_equations(equations, e_list, vars_values):
+    # Calculating all variables
+    for i, eq in enumerate(equations):
+        # Calculating the i-th lambda of equations list
+        new_value = eq(*vars_values)
+
+        # Adding i-th error to the e_list
+        e_list.append(abs(vars_values[i] - new_value))
+
+        # Set current i-th vars_values variable to it's newly calculated new_value
+        vars_values[i] = new_value
+
+def iterate_matrix(matrix, e_list, vars_values):
+    # Calculating all variables
+    for i, row in enumerate(matrix):
+        # Calculating the i-th X variable
+        # Initializing current X with B coefficient value
+        new_value = row[-1]
+        for j in range(0, len(row) - 1):
+            if i != j:
+                # Subtracting the non-diagonal values multiplied by calculated previously values
+                new_value -= (row[j] * vars_values[j])
+
+        # Adding the value on a diagonal of the matrix
+        new_value *= 1/row[i]
+
+        # Adding i-th error to the e_list
+        e_list.append(abs(vars_values[i] - new_value))
+
+        # Set current i-th vars_values variable to it's newly calculated new_value
+        vars_values[i] = new_value
 
 def check_error_rate(e_list: list, e):
     return all([current_e > e for current_e in e_list])
