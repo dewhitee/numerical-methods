@@ -6,6 +6,7 @@ import numpy as np
 from scipy import interpolate
 from scipy.interpolate import interp1d
 import lab2_spline_interpolation.spline_interpolation as si
+import lab1_gauss_elimination.gauss_elimination as ge
 
 x_points = [0, 1, 2, 3, 4, 5]
 y_points = [12, 14, 22, 39, 58, 77]
@@ -30,8 +31,6 @@ y_points = [12, 14, 22, 39, 58, 77]
 # plt.title('Cubic-spline interpolation')
 # plt.show()
 
-
-# si.cubic_spline_interpolation(x_points, y_points, None)
 
 from scipy.interpolate import CubicSpline
 
@@ -74,3 +73,11 @@ print('S(3.6')
 
 # Cubic spline interpolation calculus example
 #  https://www.youtube.com/watch?v=gT7F3TWihvk
+
+#ge.gauss_elimination([[-1, 0.5], [0, 0], [3, 3]], ['k0', 'k1', 'k2'])
+
+si.CubicSplineInterpolator(
+    known_vectorX=x_points, 
+    known_vectorY=y_points,
+    known_points=None, 
+    vars=['x1','x2','x3','x4','x5','x6'])

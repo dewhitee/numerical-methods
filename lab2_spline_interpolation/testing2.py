@@ -83,3 +83,8 @@ def cubic_spline(x, y, tol=1e-100):
 
     return b.squeeze(), c.squeeze(), d.squeeze()
 
+
+x_points = [0, 1, 2, 3, 4, 5]
+y_points = [12, 14, 22, 39, 58, 77]
+
+print(cubic_spline(x_points, y_points))
