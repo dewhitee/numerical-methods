@@ -48,6 +48,11 @@ def get_vectorB_unpacked(matrix: list) -> list:
     """
     return [row[0] for row in get_vectorB(matrix)]
 
+def unpack_vector(v: list) -> list:
+    """
+    """
+    return [row[0] for row in v]
+
 def get_vector_norm_euc(vec: list) -> float:
     """ Calculates the norm of the vector by the Euclidean formula.
     """
@@ -151,8 +156,12 @@ def full_print(matrix: list, vars: list, title: str):
     """ Prints the whole matrix with the custom title
     """
     print("\n"+title+" matrix:")
-    for (var, row) in zip(vars, matrix):
-        print(var, *["%0.4f" % elem for elem in row], sep='\t  ')
+    if vars is not None:
+        for (var, row) in zip(vars, matrix):
+            print(var, *["%0.4f" % elem for elem in row], sep='\t  ')
+    else:
+        for row in matrix:
+            print(*["%0.4f" % elem for elem in row], sep='\t  ')
 
 def A_print(matrix: list, vars: list):
     """ Prints the matrixA of the specified whole matrix
@@ -168,8 +177,12 @@ def B_print(matrix: list, vars: list):
     """
     print("\nB vector:")
     vectorB = [row[-1:] for row in matrix]
-    for (var, row) in zip(vars, vectorB):
-        print(var, *["%0.4f" % elem for elem in row], sep='\t  ')
+    if vars is not None:
+        for (var, row) in zip(vars, vectorB):
+            print(var, *["%0.4f" % elem for elem in row], sep='\t  ')
+    else:
+        for row in vectorB:
+            print(*["%0.4f" % elem for elem in row], sep='\t  ')
 
 def X_print(vectorX: list, vars: list):
     """ Prints the answers vectorX

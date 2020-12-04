@@ -21,7 +21,7 @@ test_1_vars = ['x1', 'x2', 'x3', 'x4']
 mh.solve_with_gauss_elimination(
     matrix=test_1_matrix, 
     vars=test_1_vars, 
-    print_only_results=True, 
+    print_only_results=False, 
     matrix_name="Initial matrix")
 
 # -----

@@ -76,8 +76,10 @@ print('S(3.6')
 
 #ge.gauss_elimination([[-1, 0.5], [0, 0], [3, 3]], ['k0', 'k1', 'k2'])
 
-si.CubicSplineInterpolator(
+result = si.CubicSplineInterpolator(
     known_vectorX=x_points, 
     known_vectorY=y_points,
     known_points=None, 
-    vars=['x1','x2','x3','x4','x5','x6'])
+    vars=['x1', 'x2', 'x3', 'x4', 'x5', 'x6', 'x7'])
+
+print('C coefficient')

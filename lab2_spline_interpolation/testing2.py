@@ -63,6 +63,9 @@ def cubic_spline(x, y, tol=1e-100):
     A[0, 0] = 1
     A[-1, -1] = 1
 
+    print("matrix A = ", A)
+    print("vector b =", b)
+
     for i in range(1, size-1):
         A[i, i-1] = delta_x[i-1]
         A[i, i+1] = delta_x[i]
