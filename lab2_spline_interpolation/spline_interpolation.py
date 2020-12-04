@@ -115,22 +115,16 @@ class CubicSplineInterpolator:
         # Initializing vector of undefined variables A
         self.coefficientsA = copy.deepcopy(self.vectorY)
 
-        # Get the dirrerences of X (vectorH, in our case) and Y, to easily iterate
-        #deltaX = np.diff(self.vectorX)
+        # Get the dirrerences of Y, to easily iterate
         self.deltaY = np.diff(self.vectorY)
 
         # Construct the matrix of coefficients
         # Initializing matrix A and getting the calculated C coefficients from solving the system
         self.matrixA, self.vectorC = self.construct_tridiagonal_matrix()
 
-        # Converting matrixA and vector of calculated C coefficients to ndarray
-        self.matrixA = np.array(self.matrixA)
-        self.vectorC = np.array(self.vectorC)
-
         # Solving tridiagonal matrix and getting calculated unknown C coefficients vector
         self.coefficientsC = self.solve_tridiagonal_matrix(self.matrixA, self.vectorC, vars)
         self.coefficientsC = np.array(self.coefficientsC)
-        print("coefficientsC=",self.coefficientsC)
 
         # Initialize empty 1D vectors of B and D unknown coefficients of size n - 1
         self.coefficientsB = np.zeros(shape=(self.points_count - 1, 1))
@@ -240,5 +234,5 @@ class CubicSplineInterpolator:
 
         # Returning matrixA and vectorB. 
         # Converting them to list, because ndarray from numpy don't have an append method, which is required in the call of gauss_elimination
-        return A.tolist(), b.tolist()
+        return A, b
 
