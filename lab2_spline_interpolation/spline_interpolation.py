@@ -129,6 +129,8 @@ class CubicSplineInterpolator:
 
         # Solving tridiagonal matrix and getting calculated unknown C coefficients vector
         self.coefficientsC = self.solve_tridiagonal_matrix(self.matrixA, self.vectorC, vars)
+        self.coefficientsC = np.array(self.coefficientsC)
+        print("coefficientsC=",self.coefficientsC)
 
         # Initialize empty 1D vectors of B and D unknown coefficients of size n - 1
         self.coefficientsB = np.zeros(shape=(self.points_count - 1, 1))
@@ -164,32 +166,40 @@ class CubicSplineInterpolator:
         return self.coefficientsA[i] + self.coefficientsB[i][0] * h + self.coefficientsC[i] * (h ** 2) + self.coefficientsD[i][0] * (h ** 3)
 
     def solve_tridiagonal_matrix(self, matrixA, vectorB, vars) -> list:
-
         # Solve the matrix using the Gaussian Elimination method (or tridiagonal matrix solve algorithm)
         # Calculating C unknown coefficients vector
+        # Thomas algorithm
+        n = len(matrixA)
 
-        # ndarray to list of lists
-        #print("Matrix appended:\n", mh.append_vectorB(self.matrixA.tolist(), mh.unpack_vector(vectorB.tolist())))
+        # see https://e.tsi.lv/pluginfile.php/130692/mod_resource/content/2/%D0%A7%D0%B8%D1%81%D0%BB%D0%B5%D0%BD%D0%BD%D1%8B%D0%B5%20%D0%BC%D0%B5%D1%82%D0%BE%D0%B4%D1%8B_LECTURES-2017.pdf
+        # Initialize two 1D vectors to hold Ai and Bi values (or ak and bk, as in the pdf)
+        alphas = [0] * n
+        betas = [0] * n
 
-        #return gs.gauss_seidel(
-        #    equations=None,
-        #    matrix=mh.append_vectorB(self.matrixA.tolist(), mh.unpack_vector(vectorB.tolist())),
-        #    vars=vars,
-        #    e=0.0001,
-        #    print_only_results=False,
-        #    matrix_name="Solved augmented matrix")
+        # Initializing a1 and b1
+        alphas[0] = matrixA[0, 1] / matrixA[0, 0]
+        betas[0] = vectorB[0][0] / matrixA[0, 0]
 
-        # implement tridiagonal solving algorithm
-        for i in range(2, len(self.matrixA)):
-            matrixA[i, i-1] /= matrixA[i - 1, i]
-            matrixA[i, i] -= matrixA[i, i-1] * matrixA[i - 1, i+1]
-            matrixA[i, i+1] = (vectorH[i] + vectorH[i + 1]) / 3
+        # Calculate values for each alpha and beta
+        for i in range(1, n - 1):
+            alphas[i] = matrixA[i, i + 1] / (matrixA[i, i] - matrixA[i, i-1] * alphas[i-1])
+            betas[i] = (vectorB[i][0] - matrixA[i, i-1] * betas[i-1]) / (matrixA[i, i] - matrixA[i, i-1] * alphas[i - 1])
+        
+        # Initialize vector of out X results, where x_n = beta_n
+        X = [0] * n
+        X[n - 1] = betas[n - 1]
 
+        print("alphas=",alphas)
+        print("betas=",betas)
 
-        #print("Matrix A:\n", matrixA, "\nVector B:\n", vectorB)
+        # Backward substitution
+        for i in range(n - 2, -1, -1):
+            X[i] = betas[i] - alphas[i] * X[i + 1]
 
-        import testing2
-        return testing2.jacobi(matrixA, vectorB, np.zeros(len(self.matrixA)), tol=1e-100, n_iterations=1000)
+        return X
+
+        #import testing2
+        #return testing2.jacobi(matrixA, vectorB, np.zeros(len(self.matrixA)), tol=1e-100, n_iterations=1000)
 
     def print_results_table(self):
         print("Cubic Spline Interpolation results table ---------------------------------------------")
