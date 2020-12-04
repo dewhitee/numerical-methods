@@ -14,13 +14,16 @@ def gauss_elimination(matrix: list, vars: list, print_only_results: bool = False
 
     matrix_len = len(matrix)
     matrix_copy = copy.deepcopy(matrix)
+
+    def print_matrix():
+        for (var, row) in zip(vars, matrix_copy):
+            print(var, *["%0.4f" % elem for elem in row], sep='\t')
+
     print('\n-------------------------------------Gauss Elimination - ' + matrix_name)
     if not print_only_results:
         print('Length of the matrix (n):', matrix_len)
-
         print('Matrix before pivotisation (initial):\n')
-        for (var, row) in zip(vars, matrix_copy):
-            print(var, *["%0.4f" % elem for elem in row], sep='\t')
+        print_matrix()
 
     # Find the pivot element - we need to put it as the first row in the matrix
     for i in range(matrix_len):
@@ -32,8 +35,7 @@ def gauss_elimination(matrix: list, vars: list, print_only_results: bool = False
 
     if not print_only_results:
         print('\nMatrix after pivotisation:\n')
-        for (var, row) in zip(vars, matrix_copy):
-            print(var, *["%0.4f" % elem for elem in row], sep='\t')
+        print_matrix()
 
     # Main Gauss Elimination loop
     # Forward elimination -- Straight step (Nulling the bottom-left corner)
@@ -48,8 +50,7 @@ def gauss_elimination(matrix: list, vars: list, print_only_results: bool = False
 
     if not print_only_results:
         print('\nMatrix after gauss elimination:\n')
-        for (var, row) in zip(vars, matrix_copy):
-            print(var, *["%0.4f" % elem for elem in row], sep='\t  ')
+        print_matrix()
 
     # List of variables values (x, y, z, ...)
     # Initializing all variables values with zero
@@ -74,11 +75,9 @@ def gauss_elimination(matrix: list, vars: list, print_only_results: bool = False
     print('\nSolution:')
     for (var, val) in zip(vars, vars_values):
         print(var, '= %0.4f' %(val))
-
     print('-------------------------------------\n')
 
     return vars_values
-
 
 test_matrix = [
     [25, 5, 1, 106.8],

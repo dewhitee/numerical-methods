@@ -3,11 +3,12 @@ import copy
 import os, sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import lab1_gauss_elimination.gauss_elimination as ge
+import lab1_gauss_seidel.gauss_seidel as gs
 import matrix_helpers as mh
 
 class CubicSplineInterpolator:
 
-    def __init__(self, known_vectorX: list, known_vectorY: list, known_points: list, step: float = 0.1, resolution = 10, vars = []):
+    def __init__(self, known_vectorX: list, known_vectorY: list, known_points: list, vars = []):
         """ 
         known_points -- is the list of pairs of the points (nodes) that are known at the start
 
@@ -101,9 +102,6 @@ class CubicSplineInterpolator:
                     { 3 + (3/2)*(x-2) + (3/4)*(x-2)^2 - (1/4)*(x-2)^3        for x in [2, 3] (second range)
         """
         self.known_points = known_points
-        self.step = step
-        self.resolution = resolution
-
         self.points_count = len(known_points if known_points is not None else known_vectorX)
         self.spline_count = self.points_count - 1
 
@@ -114,53 +112,23 @@ class CubicSplineInterpolator:
         # Initialize vectorH - vector of vectorX[i] - vectorX[i-1] or vectorX[i + 1] - vectorX[i]
         self.vectorH = [self.vectorX[i] - self.vectorX[i - 1] for i in range(1, self.points_count)]
 
-        print('vectorX =', self.vectorX, '\nvectorY =', self.vectorY, '\nvectorH =', self.vectorH)
-
-        # Initializing vectors of undefined variables A, B, C, D
-        self.vectorA = copy.deepcopy(self.vectorY)
-        self.vectorB = list()
-        self.vectorC = list()
-        self.vectorD = list()
-        
-        # Initializing vectors of interpolated X and Y
-        self.interpolated_vectorX = list()
-        self.interpolated_vectorY = list()
-
-        # Initializing list of boundary conditions for natural cubic spline interpolation
-        #self.boundary_conditions = list().append((2, np.zeros(self.vectorY.shape[1:])))
-
-        # Set the initial value of the current_value as the x of the first known_point
-        #current_value = self.vectorX[0]
-
-        # Populate interpolated_vectorX with the specified step
-        #for i in np.arange(0, self.resolution / self.step, self.step):
-        #    self.interpolated_vectorX.append(current_value)
-        #    current_value += self.step
-
-        #print("Interpolated vectorX =", self.interpolated_vectorX)
-
-        # Initializing the variable that holds the length of the newly populated interpolated_vectorX
-        #self.interpolated_vectorX_size = len(self.interpolated_vectorX)
+        # Initializing vector of undefined variables A
+        self.coefficientsA = copy.deepcopy(self.vectorY)
 
         # Get the dirrerences of X (vectorH, in our case) and Y, to easily iterate
-        #delta_x = np.diff(self.vectorX)
-        self.delta_y = np.diff(self.vectorY)
+        #deltaX = np.diff(self.vectorX)
+        self.deltaY = np.diff(self.vectorY)
 
         # Construct the matrix of coefficients
-        # Initializing matrix
-        self.matrix, self.vectorC = self.construct_tridiagonal_matrix()
+        # Initializing matrix A and getting the calculated C coefficients from solving the system
+        self.matrixA, self.vectorC = self.construct_tridiagonal_matrix()
 
-        #mh.full_print(matrix=self.matrix, vars=vars, title="Constructed matrix")
-        #self.matrix = mh.append_vectorB(self.matrix, mh.unpack_vector(self.vectorC))
-
-        print('matrix with appended vector:', self.matrix)
-        mh.show_A_B(matrix=self.matrix)
-
-        self.matrix = np.array(self.matrix)
+        # Converting matrixA and vector of calculated C coefficients to ndarray
+        self.matrixA = np.array(self.matrixA)
         self.vectorC = np.array(self.vectorC)
 
         # Solving tridiagonal matrix and getting calculated unknown C coefficients vector
-        self.coefficientsC = self.solve_tridiagonal_matrix(self.matrix, self.vectorC, vars)
+        self.coefficientsC = self.solve_tridiagonal_matrix(self.matrixA, self.vectorC, vars)
 
         # Initialize empty 1D vectors of B and D unknown coefficients of size n - 1
         self.coefficientsB = np.zeros(shape=(self.points_count - 1, 1))
@@ -169,78 +137,63 @@ class CubicSplineInterpolator:
         # Iterating to calculate unknown B and D coefficients from the C coefficients vector
         for i in range(0, len(self.coefficientsD)):
             self.coefficientsD[i] = (self.coefficientsC[i + 1] - self.coefficientsC[i]) / (3 * self.vectorH[i])
-            self.coefficientsB[i] = (self.delta_y[i]/self.vectorH[i]) - (self.vectorH[i]/3) * (2*self.coefficientsC[i] + self.coefficientsC[i+1])
+            self.coefficientsB[i] = (self.deltaY[i]/self.vectorH[i]) - (self.vectorH[i]/3) * (2*self.coefficientsC[i] + self.coefficientsC[i+1])
 
         # Printing final table of coefficients
         self.print_results_table()
 
-        # END   --------------------
+        # def get_tridiagonal_matrix(a: list, b: list, c: list, k1=-1, k2=0, k3=1):
+        #     return np.diag(a, k1) + np.diag(b, k2) + np.diag(c, k3)
 
-        #---------------------------
-        # --- Helpers ---
+    def get_xy(self, step: float = 0.1, resolution=10):
+        # May be used lated to create the vectors of points for each spline
+        self.step = step
+        self.resolution = resolution
 
-        #def get_x(known_point: list) -> float:
-        #    return known_point[0]
-        
-        #def get_y(known_point: list) -> float:
-        #    return known_point[1]
-        
-        #def get_h(index) -> float:
-        #    """ Returns the difference between current x (at specified index) and previous x
-        #    """
-        #    return get_x(known_points[index - 1]) - get_x(known_points[index])
-        
-        #def get_a(index) -> float:
-        #    return get_y(index)
-        
-        #def get_b(index, m_current, m_next):
-        #    return (get_y(index + 1) - get_y(index)) / get_h(index) - (get_h(index) / 2) * m_current - (get_h(index) / 6)*(m_next - m_current)
+        for i in len(self.spline_count):
+            exit
 
-        #def get_c(index, m_current):
-        #    return m_current/2
+    def print_sx(self, x: float, spline_index: int):
+        print(f'S{spline_index}({x}) = {self.get_sx(x, spline_index)}')
 
-        #def get_d(index, m_current, m_next):
-        #    return (m_next - m_current) / (6 * get_h(index))
-
-        #def get_s_0(index, a, b, c, d):
-        #    return a + b*get_h(index) + c*get_h(index) ** 2 + d*get_h(index) ** 3
-
-        #def get_s_1(index, b, c, d):
-        #    return b + 2*c*get_h(index) + 3*d*get_h(index) ** 2
-
-        #def get_s_2(index, c, d):
-        #    return 2*c + 6*d*get_x(index)
-
-        #def solve_tridiag_matrix(sub: list, diag: list, sup: list, b: list, n: int):
-        #    for i in range(2, n + 1):
-        #        sub[i] /= diag[i - 1]
-        #        diag[i] -= sub[i] * sup[i - 1]
-        #        b[i] -= sub[i] * b[i - 1]
-#
-        #    b[n] /= diag[n]
-#
-        #    for i in range(n - 1, 0, -1):
-        #        b[i] = (b[i] - sup[i] * b[i + 1]) / diag[i]
-
-        def get_tridiagonal_matrix(a: list, b: list, c: list, k1=-1, k2=0, k3=1):
-            return np.diag(a, k1) + np.diag(b, k2) + np.diag(c, k3)
+    def get_sx(self, x: float, spline_index: int):
+        i = spline_index
+        previous_x = self.vectorX[spline_index]
+        h = x - previous_x
+        print("h = ", h)
+        return self.coefficientsA[i] + self.coefficientsB[i][0] * h + self.coefficientsC[i] * (h ** 2) + self.coefficientsD[i][0] * (h ** 3)
 
     def solve_tridiagonal_matrix(self, matrixA, vectorB, vars) -> list:
 
         # Solve the matrix using the Gaussian Elimination method (or tridiagonal matrix solve algorithm)
         # Calculating C unknown coefficients vector
-        #self.coefficientsC = ge.gauss_elimination(
-        #    matrix=self.matrix[:-1],
+
+        # ndarray to list of lists
+        #print("Matrix appended:\n", mh.append_vectorB(self.matrixA.tolist(), mh.unpack_vector(vectorB.tolist())))
+
+        #return gs.gauss_seidel(
+        #    equations=None,
+        #    matrix=mh.append_vectorB(self.matrixA.tolist(), mh.unpack_vector(vectorB.tolist())),
         #    vars=vars,
+        #    e=0.0001,
         #    print_only_results=False,
         #    matrix_name="Solved augmented matrix")
 
+        # implement tridiagonal solving algorithm
+        for i in range(2, len(self.matrixA)):
+            matrixA[i, i-1] /= matrixA[i - 1, i]
+            matrixA[i, i] -= matrixA[i, i-1] * matrixA[i - 1, i+1]
+            matrixA[i, i+1] = (vectorH[i] + vectorH[i + 1]) / 3
+
+
+        #print("Matrix A:\n", matrixA, "\nVector B:\n", vectorB)
+
         import testing2
-        return testing2.jacobi(matrixA, vectorB, np.zeros(len(self.matrix)), tol=1e-100, n_iterations=1000)
+        return testing2.jacobi(matrixA, vectorB, np.zeros(len(self.matrixA)), tol=1e-100, n_iterations=1000)
 
     def print_results_table(self):
         print("Cubic Spline Interpolation results table ---------------------------------------------")
-        A = list(self.vectorA)
+        A = list(self.coefficientsA)
         B = list(self.coefficientsB.tolist())
         C = list(self.coefficientsC.tolist())
         D = list(self.coefficientsD.tolist())
@@ -248,113 +201,34 @@ class CubicSplineInterpolator:
         print('{:-<80}'.format(""))
         for i in range(0, self.spline_count):
             print(
-                f'{i:<16} | {A[i]}{"":<{16 - len(str(A[i]))}} | {B[i]}{"":<{16 - len(str(B[i]))}} | {C[i]}{"":<{16 - len(str(C[i]))}} | {D[i]}{"":<{16 - len(str(D[i]))}}')
+                f'{i:<16} | {A[i]}{"":<{16 - len(str(A[i]))}} | {B[i][0]}{"":<{16 - len(str(B[i][0]))}} | {C[i]}{"":<{16 - len(str(C[i]))}} | {D[i][0]}{"":<{16 - len(str(D[i][0]))}}')
         print("--------------------------------------------------------------------------------------")
 
-    # def interpolate(self):
-    #     interp_resolution = self.interpolated_vectorX_size / self.points_count
-    #     for i in range(0, len(vectorH)):
-    #         for k in range(0, self.resolution):
-    #             deltaX = k / self.resolution * vectorH[i]
-    #             termA = vectorA[i]
-    #             termB = vectorB[i]
-    #             termC = vectorC[i]
-    #             termD = vectorD[i]
-    #             interpolated_index = i * self.resolution + k
-    #             interpolated_vectorX[interpolated_index] = deltaX + self.vectorX[i]
-    #             interpolated_vectorY[interpolated_index] = termA + termB + termC + termD
-        # Remove uninitialized variables
-        #points_to_keep = resolution * (points_count - 1)
-        #interpolated_vectorX_copy = copy.deepcopy()
-        # ...
-        # https://github.com/swharden/ScottPlot/blob/404105e5d7ae8399b2e40e9bd64b246d3b3b80dd/src/ScottPlot/Statistics/Interpolation/SplineInterpolator.cs
-
-    # def integrate(self):
-    #     integral = 0
-    #     for i in range(0, len(self.vectorH)):
-    #         termA = self.vectorA[i] * self.vectorH[i]
-    #         termB = self.vectorB[i] * (self.vectorH[i] ** 2) / 2.0
-    #         termC = self.vectorC[i] * (self.vectorH[i] ** 3) / 3.0
-    #         termD = self.vectorD[i] * (self.vectorH[i] ** 4) / 4.0
-    #     return integral
-
     def construct_tridiagonal_matrix(self):
-        # Constructing right coefficients vector C (or b, for the convenience)
-        print("self.spline_count=", self.spline_count)
-        print("len(self.vectorY)=", len(self.vectorY))
-        print("len(self.vectorH)=", len(self.vectorH))
-        vectorC = [0] * 2
-        for i in range(2, self.spline_count):
-            print("iteration:", i)
-            vectorC.append(
-                3 * (self.vectorY[i] - self.vectorY[i - 1]) / self.vectorH[i] - (self.vectorY[i - 1] - self.vectorY[i - 2]) / self.vectorH[i - 1]
-            )
+        # --- Constructing the tridiagonal matrix A as hi*ci + 2*(hi-1 + hi)*ci + hi*ci+1
 
-        #matrix = list()
-        matrix = np.zeros((self.spline_count, self.spline_count))
-        print('zeroed_matrix=',matrix)
-
-        # Constructing the tridiagonal matrix as hi*ci + 2*(hi-1 + hi)*ci + hi*ci+1
-        print("self.spline_count=", self.spline_count)
-        print("len(self.vectorC)=", len(vectorC))
-        print("vectorC=",vectorC)
-        #for i in range(2, self.spline_count - 1):
-        #    print("iteration:",i)
-        #    matrix.append(
-        #        self.vectorH[i - 1]*vectorC[i - 1] + 2*(self.vectorH[i - 1] + self.vectorH[i]) * vectorC[i] + self.vectorH[i - 1]*vectorC[i + 1]
-        #    )
-
-        #for i in range(2, self.spline_count - 1):
-        #    print("iteration:",i)
-        #    matrix[i][i] = self.vectorH[i - 1]*vectorC[i - 1] + 2*(self.vectorH[i - 1] + self.vectorH[i]) * vectorC[i] + self.vectorH[i - 1]*vectorC[i + 1]
-        
-        # upper_diagonal = np.zeros((self.spline_count, self.spline_count))
-        # print('init upper_diagonal=', upper_diagonal)
-        # for i in range(2, self.spline_count - 1):
-        #     print("iteration:", i)
-        #     print("upper_diagonal[i][i]=", upper_diagonal[i][i])
-        #     print("self.vectorH[i-1]=",self.vectorH[i - 1])
-        #     print("self.vectorC[i-1]=", self.vectorC[i - 1])
-        #     upper_diagonal[i][i] = self.vectorH[i - 1] * self.vectorC[i - 1]
-        # print('upper_diagonal=', upper_diagonal)
-
-        # main_diagonal = np.zeros((self.spline_count, self.spline_count))
-        # print('init main_diagonal=',main_diagonal)
-        # for i in range(1, self.spline_count):
-        #     print("iteration:", i)
-        #     main_diagonal[i][i] = 2 * (self.vectorH[i - 1] * self.vectorC[i])
-        # print('main_diagonal=',main_diagonal)
-
-        # lower_diagonal = np.zeros((self.spline_count, self.spline_count))
-        # print('init lower_diagonal=', lower_diagonal)
-        # for i in range(1, self.spline_count - 1):
-        #     print("iteration:", i)
-        #     lower_diagonal[i][i] = self.vectorH[i] * self.vectorC[i + 1]
-        # print('lower_diagonal=', lower_diagonal)
-
-        # Constructing the matrix --------------------------------
-        ### Get matrix A
+        # Initializing the squared A matrix with zeros
         A = np.zeros(shape=(self.points_count, self.points_count))
+
+        # Initializing the 1D vector B with zeros
         b = np.zeros(shape=(self.points_count, 1))
+
+        # Set the first element (the most upper-left element in the matrix) to 1
         A[0, 0] = 1
+
+        # Set the last element (the most lower-right element in the matrix) to 1
         A[-1, -1] = 1
 
         # See https://e.tsi.lv/pluginfile.php/130692/mod_resource/content/2/%D0%A7%D0%B8%D1%81%D0%BB%D0%B5%D0%BD%D0%BD%D1%8B%D0%B5%20%D0%BC%D0%B5%D1%82%D0%BE%D0%B4%D1%8B_LECTURES-2017.pdf
         for i in range(1, self.points_count - 1):
-            # Set lower-diagonal element
-            A[i, i-1] = self.vectorH[i-1]
-            # Set upper-diagonal element
-            A[i, i+1] = self.vectorH[i]
-            # Set main-diagonal element
-            A[i, i] = 2*(self.vectorH[i-1]+self.vectorH[i])
-            ### Get matrix b (C coefficients)
-            b[i, 0] = 3*(self.delta_y[i]/self.vectorH[i] - self.delta_y[i-1]/self.vectorH[i-1])
+            A[i, i-1] = self.vectorH[i-1]                   # Set lower-diagonal element
+            A[i, i+1] = self.vectorH[i]                     # Set upper-diagonal element
+            A[i, i] = 2*(self.vectorH[i-1]+self.vectorH[i]) # Set main-diagonal element
 
-        #return matrix, vectorC
+            # Get vector B (C coefficients)
+            b[i, 0] = 3*(self.deltaY[i]/self.vectorH[i] - self.deltaY[i-1]/self.vectorH[i-1])
+
         # Returning matrixA and vectorB. 
         # Converting them to list, because ndarray from numpy don't have an append method, which is required in the call of gauss_elimination
         return A.tolist(), b.tolist()
 
-    #def interpolate_cubic(p0, p1, p2, p3, p4, x):
-    #    return (-(1/2)*p0 + (3/2)*p1 - (3/2)*p2 + (1/2)*p3)*(x**3) 
-    #    + (p0 - (5/2)*p1 + 2*p2 - (1/2)*p3)*(x**2) + (-(1/2)*p0 + (1/2)*p2)*x + p1
