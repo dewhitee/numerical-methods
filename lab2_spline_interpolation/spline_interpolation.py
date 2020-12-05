@@ -165,6 +165,8 @@ class CubicSplineInterpolator:
 
         if makeplot:
             plt.figure("Cubic-spline Interpolation by dewhitee")
+            plt.xlabel("X values")
+            plt.ylabel("Y values")
             if showpoints:
                 plt.plot(out_vectorX, out_vectorY, "bo-", markersize=2)
             else:

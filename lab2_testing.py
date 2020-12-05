@@ -19,7 +19,7 @@ cubic_spline_result = si.CubicSplineInterpolator(
 )
 
 interpolatedX, interpolatedY = cubic_spline_result.get_xy(
-    resolution=8,
+    resolution=30,
     makeplot=True
 )
 #print("interpolatedX:\n", interpolatedX, "\ninterpolatedY:\n", interpolatedY)
