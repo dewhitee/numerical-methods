@@ -7,7 +7,7 @@ import numpy as np
 import matrix_helpers as mh
 import lab1_gauss_elimination.gauss_elimination as ge
 
-def least_squares(vectorX: list, vectorY: list, k_approx_order: int = 2, ftype: str = "linear", makeplot=False):
+def least_squares(vectorX: list, vectorY: list, k_approx_order: int = 2, ftype: str = "linear", makeplot=False, customfunc=None):
     """ Calculates least squares for the choosen ftype
 
     !Returns:
@@ -41,6 +41,9 @@ def least_squares(vectorX: list, vectorY: list, k_approx_order: int = 2, ftype: 
         vars=['x'+str(i) for i in range(0, n)],
         matrix_name="")
 
+    print("solution_vectorX = ", solution_vectorX)
+    print("vectorX[0]=",vectorX[0])
+
     # Then we need to calculate the approximation vector from the solution vector
     # using the choosen type of approximation function (linear by default)
     if ftype == "linear":
@@ -48,8 +51,6 @@ def least_squares(vectorX: list, vectorY: list, k_approx_order: int = 2, ftype: 
             print("a * x + sum(solutions) = ", a, "*", x, "+",
                   sum(solution_vectorX[:-1]), "=", a * x + sum(solution_vectorX[:-1]))
             return a * x + sum(solution_vectorX[:-1])
-        print("solution_vectorX = ", solution_vectorX)
-        print("vectorX[0]=",vectorX[0])
         vectorF = [linfunc(solution_vectorX[-1], vectorX[i]) for i in range(0, n)]
         vector_deltaF = [(vectorY[i] - vectorF[i]) ** 2 for i in range(0, n)]
 
@@ -57,19 +58,21 @@ def least_squares(vectorX: list, vectorY: list, k_approx_order: int = 2, ftype: 
         print("vectorF:\n", vectorF, "\nvector_deltaF:\n", vector_deltaF)
         print("\n--------------------------- End Least Squares")
 
-        if makeplot:
-            plt.plot(vectorX, vectorY, 'bs', vectorX, vectorF, 'g--', vectorX, vectorF, 'g^')
-            plt.xlabel("X values")
-            plt.ylabel("Y values")
-            for i in range(0, len(vectorX) - 1):
-                plt.plot([vectorX[i], vectorX[i]], [vectorY[i], vectorF[i]], 'r--')
-
-            plt.show()
+        make_plot(vectorX, vectorY, vectorF, makeplot)
 
         return vectorF, vector_deltaF
 
     elif ftype == "exponential":
         exit
+
+    elif ftype == "custom":
+        # Uses the customfunc lambda to approximate given data
+        vectorF = [customfunc(solution_vectorX[-1], vectorX[i]) for i in range(0, n)]
+        vector_deltaF = [(vectorY[i] - vectorF[i]) ** 2 for i in range(0, n)]
+        print("Sum of vector_deltaF =", sum(vector_deltaF))
+        print("vectorF:\n", vectorF, "\nvector_deltaF:\n", vector_deltaF)
+        print("\n--------------------------- End Least Squares")
+        make_plot(vectorX, vectorY, vectorF, makeplot)
 
     # Linear superposition as approximation function
     #def approximation_function(x: float, k: int):
@@ -83,6 +86,16 @@ def least_squares(vectorX: list, vectorY: list, k_approx_order: int = 2, ftype: 
     #result = float()
     #for i in range(0, n):
     #    result += (approximation_function(X[i], k) - Y[i]) ** 2
+
+def make_plot(vectorX, vectorY, vectorF, makeplot):
+    if makeplot:
+        plt.plot(vectorX, vectorY, 'bs', vectorX, vectorF, 'g--', vectorX, vectorF, 'g^')
+        plt.xlabel("X values")
+        plt.ylabel("Y values")
+        for i in range(0, len(vectorX) - 1):
+            plt.plot([vectorX[i], vectorX[i]], [vectorY[i], vectorF[i]], 'r--')
+
+        plt.show()
 
 def get_power_basis_matrix(current_k: int, vectorX: list, vectorY: list):
     """ Function must return the matrix of equations.

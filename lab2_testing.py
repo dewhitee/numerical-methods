@@ -28,7 +28,8 @@ least_squares_approx_result = ls.least_squares(
     vectorX=known_vectorX,
     vectorY=known_vectorY,
     k_approx_order=1,
-    makeplot=True
+    makeplot=True,
+    ftype="linear"
 )
 
 cs = CubicSpline(known_vectorX, known_vectorY, bc_type='natural')
@@ -36,3 +37,29 @@ print("S(0)", cs(0))
 print("S(3.3)", cs(3.3))
 
 #plt.plot()
+
+
+#def fun_rosenbrock(x):
+#    return np.array([10 * (x[1] - x[0]**2), (1 - x[0])])
+
+#from scipy.optimize import least_squares
+#res_1 = least_squares(fun_rosenbrock, known_vectorX)
+
+si.CubicSplineInterpolator(
+    known_vectorX=[1.2, 3.4, 6.4, 2.3, 8.5, 9.2, 3.2, 2.2, 1.2, 0.2],
+    known_vectorY=[3.2, 5.2, 8.9, 16.3, 21.2, 5.3, 55.2, 1.4, 2.1, 1.8],
+    vars=None,
+    known_points=None
+).get_xy(
+    resolution=30,
+    makeplot=True
+)
+
+least_squares_approx_result_2 = ls.least_squares(
+    vectorX=known_vectorX,
+    vectorY=known_vectorY,
+    k_approx_order=1,
+    makeplot=True,
+    ftype="custom",
+    customfunc=lambda x, y: x*y
+)
