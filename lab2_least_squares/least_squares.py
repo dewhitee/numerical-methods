@@ -58,9 +58,12 @@ def least_squares(vectorX: list, vectorY: list, k_approx_order: int = 2, ftype: 
         print("\n--------------------------- End Least Squares")
 
         if makeplot:
-            plt.plot(vectorX, vectorY, 'bs', vectorX, vectorF, 'b--')
+            plt.plot(vectorX, vectorY, 'bs', vectorX, vectorF, 'g--', vectorX, vectorF, 'g^')
             plt.xlabel("X values")
             plt.ylabel("Y values")
+            for i in range(0, len(vectorX) - 1):
+                plt.plot([vectorX[i], vectorX[i]], [vectorY[i], vectorF[i]], 'r--')
+
             plt.show()
 
         return vectorF, vector_deltaF
@@ -69,17 +72,17 @@ def least_squares(vectorX: list, vectorY: list, k_approx_order: int = 2, ftype: 
         exit
 
     # Linear superposition as approximation function
-    def approximation_function(x: float, k: int):
-        result = float()
-        # f[m] - system of the basis functions
-        # k - is the approximation order
-        for m in range(0, k):
-            result += A[m] * F[m](x)
-        return result
+    #def approximation_function(x: float, k: int):
+    #    result = float()
+    #    # f[m] - system of the basis functions
+    #    # k - is the approximation order
+    #    for m in range(0, k):
+    #        result += A[m] * F[m](x)
+    #    return result
 
-    result = float()
-    for i in range(0, n):
-        result += (approximation_function(X[i], k) - Y[i]) ** 2
+    #result = float()
+    #for i in range(0, n):
+    #    result += (approximation_function(X[i], k) - Y[i]) ** 2
 
 def get_power_basis_matrix(current_k: int, vectorX: list, vectorY: list):
     """ Function must return the matrix of equations.

@@ -1,3 +1,4 @@
+import matplotlib.pyplot as plt
 import numpy as np
 import copy
 import os, sys
@@ -141,13 +142,30 @@ class CubicSplineInterpolator:
         # def get_tridiagonal_matrix(a: list, b: list, c: list, k1=-1, k2=0, k3=1):
         #     return np.diag(a, k1) + np.diag(b, k2) + np.diag(c, k3)
 
-    def get_xy(self, step: float = 0.1, resolution=10):
+    def get_xy(self, resolution=10, makeplot=False):
         # May be used lated to create the vectors of points for each spline
-        self.step = step
         self.resolution = resolution
 
-        for i in len(self.spline_count):
-            exit
+        out_vectorX = list()
+        out_vectorY = list()
+
+        for i in range(0, self.spline_count):
+            current_step = self.vectorH[i] / resolution
+            print("current_step=", current_step)
+            current_x = self.vectorX[i]
+            print("current_x=",current_x)
+            current_y = self.vectorY[i]
+            print("current_y=",current_y)
+            for j in range(0, resolution):
+                out_vectorY.append(self.get_sx(current_x, i))
+                out_vectorX.append(current_x)
+                current_x += current_step
+
+        if makeplot:
+            plt.plot(self.vectorX, self.vectorY, "ro", out_vectorX, out_vectorY, "bo-")
+            plt.show()
+
+        return out_vectorX, out_vectorY
 
     def print_sx(self, x: float, spline_index: int):
         print(f'S{spline_index}({x}) = {self.get_sx(x, spline_index)}')
@@ -156,7 +174,7 @@ class CubicSplineInterpolator:
         i = spline_index
         previous_x = self.vectorX[spline_index]
         h = x - previous_x
-        print("h = ", h)
+        #print("h = ", h)
         return self.coefficientsA[i] + self.coefficientsB[i][0] * h + self.coefficientsC[i] * (h ** 2) + self.coefficientsD[i][0] * (h ** 3)
 
     def solve_tridiagonal_matrix(self, matrixA, vectorB, vars) -> list:
@@ -201,11 +219,20 @@ class CubicSplineInterpolator:
         B = list(self.coefficientsB.tolist())
         C = list(self.coefficientsC.tolist())
         D = list(self.coefficientsD.tolist())
+
         print(f'{"Spline number":<16} | {"ai":<16} | {"bi":<16} | {"ci":<16} | {"di":<16}')
         print('{:-<80}'.format(""))
         for i in range(0, self.spline_count):
+            a_val = round(A[i], 5)
+            a_len = len(str(a_val))
+            b_val = round(B[i][0], 5)
+            b_len = len(str(b_val))
+            c_val = round(C[i], 5)
+            c_len = len(str(c_val))
+            d_val = round(D[i][0], 5)
+            d_len = len(str(d_val))
             print(
-                f'{i:<16} | {A[i]}{"":<{16 - len(str(A[i]))}} | {B[i][0]}{"":<{16 - len(str(B[i][0]))}} | {C[i]}{"":<{16 - len(str(C[i]))}} | {D[i][0]}{"":<{16 - len(str(D[i][0]))}}')
+                f'{i:<16} | {a_val}{"":<{16 - a_len}} | {b_val}{"":<{16 - b_len}} | {c_val}{"":<{16 - c_len}} | {d_val}{"":<{16 - d_len}}')
         print("--------------------------------------------------------------------------------------")
 
     def construct_tridiagonal_matrix(self):
