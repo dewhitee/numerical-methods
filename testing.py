@@ -61,7 +61,7 @@ matrix_1_deltaB = mh.get_deltaB(matrix_1)
 
 print("\ndelta B vector:", matrix_1_deltaB)
 
-matrix_1_modified = mh.append_vectorB(matrix_1, array(matrix_1_B) + array(matrix_1_deltaB))
+matrix_1_modified = mh.append_vectorB_to_whole_matrix(matrix_1, array(matrix_1_B) + array(matrix_1_deltaB))
 mh.full_print(matrix_1_modified, matrix_1_vars, 'Modified matrix_1')
 
 matrix_1_deltaX = ge.gauss_elimination(matrix_1_modified, matrix_1_vars)

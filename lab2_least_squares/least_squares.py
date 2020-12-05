@@ -1,9 +1,18 @@
-import numpy as np
+import os
+import sys
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-def least_squares(matrix: list):
+import numpy as np
+import matrix_helpers as mh
+import lab1_gauss_elimination.gauss_elimination as ge
+
+def least_squares(vectorX: list, vectorY: list, k_approx_order: int = 2, ftype: str = "linear"):
+    """
+    """
     
-    
-    n = len(matrix)
+    print("\nLeast Squares -------------\n")
+
+    n = len(vectorX)
 
     # Initializing list of a arguments and the list of approximation functions with degree of k
     A = list()
@@ -14,10 +23,42 @@ def least_squares(matrix: list):
     X = list()
     Y = list()
 
+    # Getting matrix and b coefficients vector from the power basis
+    matrixA, vectorB = get_power_basis_matrix(k_approx_order, vectorX, vectorY)
+
+    # Making the one whole matrix from the matrixA and vectorB to pass into the Gauss Elimination solving function
+    whole_matrix = mh.only_append_vectorB(
+        matrixA.tolist(), mh.unpack_vector(vectorB.tolist()))
+
+    # Solving matrix with Gauss Elimination, getting the X vector of solutions for power basis matrix
+    solution_vectorX = ge.gauss_elimination(
+        matrix=whole_matrix, 
+        vars=['x'+str(i) for i in range(0, n)],
+        matrix_name="")
+
+    # Then we need to calculate the approximation vector from the solution vector
+    # using the choosen type of approximation function (linear by default)
+    if ftype == "linear":
+        def linfunc(a, x): 
+            print("a * x + sum(solutions) = ", a, "*", x, "+",
+                  sum(solution_vectorX[:-1]), "=", a * x + sum(solution_vectorX[:-1]))
+            return a * x + sum(solution_vectorX[:-1])
+        print("solution_vectorX = ", solution_vectorX)
+        print("vectorX[0]=",vectorX[0])
+        vectorF = [linfunc(solution_vectorX[-1], vectorX[i]) for i in range(0, n)]
+        vector_deltaF = [(vectorY[i] - vectorF[i]) ** 2 for i in range(0, n)]
+
+        print("Sum of vector_deltaF =", sum(vector_deltaF))
+        print("vectorF:\n", vectorF, "\nvector_deltaF:\n", vector_deltaF)
+        print("\n--------------------------- End Least Squares")
+        return vectorF, vector_deltaF
+
+    elif ftype == "exponential":
+        exit
+
     # Linear superposition as approximation function
     def approximation_function(x: float, k: int):
         result = float()
-
         # f[m] - system of the basis functions
         # k - is the approximation order
         for m in range(0, k):
@@ -29,7 +70,10 @@ def least_squares(matrix: list):
         result += (approximation_function(X[i], k) - Y[i]) ** 2
 
 def get_power_basis_matrix(current_k: int, vectorX: list, vectorY: list):
-    """ Function must return the matrix of equations
+    """ Function must return the matrix of equations.
+
+    If current_k is >= 10, then Condition Number of the output matrix will be infinity.
+
     algorithm reference:
     https://e.tsi.lv/pluginfile.php/130692/mod_resource/content/2/%D0%A7%D0%B8%D1%81%D0%BB%D0%B5%D0%BD%D0%BD%D1%8B%D0%B5%20%D0%BC%D0%B5%D1%82%D0%BE%D0%B4%D1%8B_LECTURES-2017.pdf
     
@@ -40,10 +84,7 @@ def get_power_basis_matrix(current_k: int, vectorX: list, vectorY: list):
     out_matrix = np.ndarray(shape=(current_k + 1, current_k + 1))
     out_b_coefficients = np.ndarray(shape=(current_k + 1, 1))
     
-    # Initializing first element (in the upper-left corner)
-    #out_matrix[0, 0] = variables_count
-    # Actually, this element can also be found in a loop if we sum the x^0 or y^0 elements
-    # Iterating starting from the second element, as the first is set to variables_count already
+    # Filling the out_matrix
     for i in range(0, current_k + 1):
         # Iterating over the elements of a row
         for j in range(0, current_k + 1):

@@ -53,6 +53,9 @@ def unpack_vector(v: list) -> list:
     """
     return [row[0] for row in v]
 
+def get_whole_matrix(matrixA: np.ndarray, vectorB: np.ndarray):
+    return only_append_vectorB(matrixA.tolist(), unpack_vector(vectorB.tolist()))
+
 def get_vector_norm_euc(vec: list) -> float:
     """ Calculates the norm of the vector by the Euclidean formula.
     """
@@ -68,7 +71,6 @@ def get_vector_norm_man(vec: list) -> float:
     for elem in vec:
         elem += abs(elem)
     return result
-
 
 def get_matrix_norm(matrix: list) -> float:
     """
@@ -98,7 +100,14 @@ def sum_matrix_to_vector(matrix: list) -> list:
     """
     return [sum(row) for row in matrix]
 
-def append_vectorB(matrix: list, vectorB: list) -> list:
+def only_append_vectorB(matrixA: list, vectorB: list) -> list:
+    """ This functions just appends each element of vectorB to the same row of matrixA
+    """
+    for i, elem in enumerate(vectorB):
+        matrixA[i].append(elem)
+    return matrixA
+
+def append_vectorB_to_whole_matrix(matrix: list, vectorB: list) -> list:
     """ This function gets the whole matrix, finds the matrixA and
     returns the matrixA with the specified vectorB as the NEW whole matrix
     """
@@ -198,6 +207,7 @@ def solve_with_gauss_elimination(matrix: list, vars: list, print_only_results: b
     vectorX = ge.gauss_elimination(matrix, vars, print_only_results, matrix_name)
     summary_data = summary(matrix, vars, vectorX, print_only_results, matrix_name)
     summary_gauss_elimination(summary_data)
+    return summary_data
 
 def solve_with_gauss_seidel(matrix: list, equations: list, vars: list, e: float, print_only_results: bool = False, 
 matrix_name: str = "", use_matrix: bool = False):
@@ -209,6 +219,7 @@ matrix_name: str = "", use_matrix: bool = False):
     summary_data.add_errors_vec(e)
     summary_data.set_use_matrix(use_matrix)
     summary_gauss_seidel(summary_data)
+    return summary_data
 
 class SummaryData:
     def __init__(self, matrix: list, adjusted_matrix: list, vars: list, X: list, AX: list, 
@@ -246,7 +257,7 @@ def summary(matrix: list, vars: list, vectorX: list, print_only_results: bool = 
     print("\nCondition number Cond(A) of this matrix is =", condA)
     deltaB = get_deltaB(matrix)
     print("\nDeltaB vector:", deltaB)
-    adjusted_matrix = append_vectorB(matrix, array(B) + array(deltaB))
+    adjusted_matrix = append_vectorB_to_whole_matrix(matrix, array(B) + array(deltaB))
     if not print_only_results:
         full_print(adjusted_matrix, vars, 'Modified (adjusted) matrix')
 
