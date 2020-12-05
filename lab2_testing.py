@@ -19,10 +19,10 @@ cubic_spline_result = si.CubicSplineInterpolator(
 )
 
 interpolatedX, interpolatedY = cubic_spline_result.get_xy(
-    resolution=20,
+    resolution=8,
     makeplot=True
 )
-print("interpolatedX:\n", interpolatedX, "\ninterpolatedY:\n", interpolatedY)
+#print("interpolatedX:\n", interpolatedX, "\ninterpolatedY:\n", interpolatedY)
 
 least_squares_approx_result = ls.least_squares(
     vectorX=known_vectorX,

@@ -142,8 +142,10 @@ class CubicSplineInterpolator:
         # def get_tridiagonal_matrix(a: list, b: list, c: list, k1=-1, k2=0, k3=1):
         #     return np.diag(a, k1) + np.diag(b, k2) + np.diag(c, k3)
 
-    def get_xy(self, resolution=10, makeplot=False):
-        # May be used lated to create the vectors of points for each spline
+    def get_xy(self, resolution=10, makeplot=False, showpoints=False):
+        """ Creates the interpolated lists of X and Y with points count specified by resolution parameter.
+        Set makeplot to true to construct the plt.plot for the splines
+        """
         self.resolution = resolution
 
         out_vectorX = list()
@@ -151,18 +153,24 @@ class CubicSplineInterpolator:
 
         for i in range(0, self.spline_count):
             current_step = self.vectorH[i] / resolution
-            print("current_step=", current_step)
             current_x = self.vectorX[i]
-            print("current_x=",current_x)
-            current_y = self.vectorY[i]
-            print("current_y=",current_y)
             for j in range(0, resolution):
                 out_vectorY.append(self.get_sx(current_x, i))
                 out_vectorX.append(current_x)
                 current_x += current_step
 
+        # Adding the last point X and Y coords to the out_vectors
+        out_vectorX.append(self.vectorX[-1])
+        out_vectorY.append(self.vectorY[-1])
+
         if makeplot:
-            plt.plot(self.vectorX, self.vectorY, "ro", out_vectorX, out_vectorY, "bo-")
+            plt.figure("Cubic-spline Interpolation by dewhitee")
+            if showpoints:
+                plt.plot(out_vectorX, out_vectorY, "bo-", markersize=2)
+            else:
+                plt.plot(out_vectorX, out_vectorY, "b-")
+            plt.plot(self.vectorX, self.vectorY, "yo")
+            plt.title('Cubic-spline interpolation')
             plt.show()
 
         return out_vectorX, out_vectorY
