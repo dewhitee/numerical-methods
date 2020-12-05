@@ -1,3 +1,4 @@
+import matplotlib.pyplot as plt
 import os
 import sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -6,8 +7,12 @@ import numpy as np
 import matrix_helpers as mh
 import lab1_gauss_elimination.gauss_elimination as ge
 
-def least_squares(vectorX: list, vectorY: list, k_approx_order: int = 2, ftype: str = "linear"):
-    """
+def least_squares(vectorX: list, vectorY: list, k_approx_order: int = 2, ftype: str = "linear", makeplot=False):
+    """ Calculates least squares for the choosen ftype
+
+    !Returns:
+        vectorF,
+        vector_deltaF
     """
     
     print("\nLeast Squares -------------\n")
@@ -51,6 +56,13 @@ def least_squares(vectorX: list, vectorY: list, k_approx_order: int = 2, ftype: 
         print("Sum of vector_deltaF =", sum(vector_deltaF))
         print("vectorF:\n", vectorF, "\nvector_deltaF:\n", vector_deltaF)
         print("\n--------------------------- End Least Squares")
+
+        if makeplot:
+            plt.plot(vectorX, vectorY, 'bs', vectorX, vectorF, 'b--')
+            plt.xlabel("X values")
+            plt.ylabel("Y values")
+            plt.show()
+
         return vectorF, vector_deltaF
 
     elif ftype == "exponential":
