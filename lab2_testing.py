@@ -11,17 +11,17 @@ vars = ['x1', 'x2', 'x3', 'x4', 'x5']
 known_vectorX = [0, 3.3, 6.6, 9.9]
 known_vectorY = [2.1, 5.9, 2.4, 3.4]
 
-cubic_spline_result = si.CubicSplineInterpolator(
-    known_vectorX=known_vectorX,
-    known_vectorY=known_vectorY,
-    vars=vars,
-    known_points=None
-)
+#cubic_spline_result = si.CubicSplineInterpolator(
+#    known_vectorX=known_vectorX,
+#    known_vectorY=known_vectorY,
+#    vars=vars,
+#    known_points=None
+#)
 
-interpolatedX, interpolatedY = cubic_spline_result.get_xy(
-    resolution=30,
-    makeplot=True
-)
+#interpolatedX, interpolatedY = cubic_spline_result.get_xy(
+#    resolution=30,
+#    makeplot=True
+#)
 #print("interpolatedX:\n", interpolatedX, "\ninterpolatedY:\n", interpolatedY)
 
 least_squares_approx_result = ls.least_squares(
@@ -32,9 +32,9 @@ least_squares_approx_result = ls.least_squares(
     ftype="linear"
 )
 
-cs = CubicSpline(known_vectorX, known_vectorY, bc_type='natural')
-print("S(0)", cs(0))
-print("S(3.3)", cs(3.3))
+#cs = CubicSpline(known_vectorX, known_vectorY, bc_type='natural')
+#print("S(0)", cs(0))
+#print("S(3.3)", cs(3.3))
 
 #plt.plot()
 
@@ -45,9 +45,12 @@ print("S(3.3)", cs(3.3))
 #from scipy.optimize import least_squares
 #res_1 = least_squares(fun_rosenbrock, known_vectorX)
 
+known_vectorX_2 = [0, 3.3, 6.6, 9.9]
+known_vectorY_2 = [12.1, 15.9, 12.4, 13.4]
+
 si.CubicSplineInterpolator(
-    known_vectorX=[1.2, 3.4, 6.4, 2.3, 8.5, 9.2, 3.2, 2.2, 1.2, 0.2],
-    known_vectorY=[3.2, 5.2, 8.9, 16.3, 21.2, 5.3, 55.2, 1.4, 2.1, 1.8],
+    known_vectorX=known_vectorX_2,
+    known_vectorY=known_vectorY_2,
     vars=None,
     known_points=None
 ).get_xy(
@@ -56,10 +59,17 @@ si.CubicSplineInterpolator(
 )
 
 least_squares_approx_result_2 = ls.least_squares(
-    vectorX=known_vectorX,
-    vectorY=known_vectorY,
-    k_approx_order=1,
+    vectorX=known_vectorX_2,
+    vectorY=known_vectorY_2,
+    k_approx_order=2,
     makeplot=True,
-    ftype="custom",
-    customfunc=lambda x, y: x*y
+    ftype="auto",
+)
+
+least_squares_approx_result_2 = ls.least_squares(
+    vectorX=known_vectorX_2,
+    vectorY=known_vectorY_2,
+    k_approx_order=3,
+    makeplot=True,
+    ftype="auto"
 )

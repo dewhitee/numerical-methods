@@ -7,7 +7,7 @@ import numpy as np
 import matrix_helpers as mh
 import lab1_gauss_elimination.gauss_elimination as ge
 
-def least_squares(vectorX: list, vectorY: list, k_approx_order: int = 2, ftype: str = "linear", makeplot=False, customfunc=None):
+def least_squares(vectorX: list, vectorY: list, k_approx_order: int = 2, ftype: str = "linear", makeplot=False, customfunc=None, resolution=10):
     """ Calculates least squares for the choosen ftype
 
     !Returns:
@@ -44,9 +44,14 @@ def least_squares(vectorX: list, vectorY: list, k_approx_order: int = 2, ftype: 
     print("solution_vectorX = ", solution_vectorX)
     print("vectorX[0]=",vectorX[0])
 
+    # Initializing vectorF and vector_deltaF as empty lists
+    vectorF = []
+    vector_deltaF = []
+
     # Then we need to calculate the approximation vector from the solution vector
     # using the choosen type of approximation function (linear by default)
     if ftype == "linear":
+        print("Using linear approximation basis function")
         def linfunc(a, x): 
             print("a * x + sum(solutions) = ", a, "*", x, "+",
                   sum(solution_vectorX[:-1]), "=", a * x + sum(solution_vectorX[:-1]))
@@ -54,25 +59,29 @@ def least_squares(vectorX: list, vectorY: list, k_approx_order: int = 2, ftype: 
         vectorF = [linfunc(solution_vectorX[-1], vectorX[i]) for i in range(0, n)]
         vector_deltaF = [(vectorY[i] - vectorF[i]) ** 2 for i in range(0, n)]
 
-        print("Sum of vector_deltaF =", sum(vector_deltaF))
-        print("vectorF:\n", vectorF, "\nvector_deltaF:\n", vector_deltaF)
-        print("\n--------------------------- End Least Squares")
-
-        make_plot(vectorX, vectorY, vectorF, makeplot)
-
-        return vectorF, vector_deltaF
-
     elif ftype == "exponential":
         exit
 
     elif ftype == "custom":
+        print("Using custom approximation basis function")
         # Uses the customfunc lambda to approximate given data
-        vectorF = [customfunc(solution_vectorX[-1], vectorX[i]) for i in range(0, n)]
+        vectorF = [customfunc(solution_vectorX, vectorX[i]) for i in range(0, n)]
         vector_deltaF = [(vectorY[i] - vectorF[i]) ** 2 for i in range(0, n)]
-        print("Sum of vector_deltaF =", sum(vector_deltaF))
-        print("vectorF:\n", vectorF, "\nvector_deltaF:\n", vector_deltaF)
-        print("\n--------------------------- End Least Squares")
-        make_plot(vectorX, vectorY, vectorF, makeplot)
+
+    elif ftype == "auto":
+        print("Using auto approximation basis function")
+        vectorF = [autofunc(solution_vectorX, vectorX[i]) for i in range(0, n)]
+        vector_deltaF = [(vectorY[i] - vectorF[i]) ** 2 for i in range(0, n)]
+
+    print("Sum of vector_deltaF =", sum(vector_deltaF))
+    print("vectorF:\n", vectorF, "\nvector_deltaF:\n", vector_deltaF)
+    print("\n--------------------------- End Least Squares")
+
+    interpolated_vectorX, interpolated_vectorY = get_interpolated_xy_vectors(vectorX, vectorF, solution_vectorX, resolution)
+
+    make_plot(vectorX, vectorY, vectorF, interpolated_vectorX, interpolated_vectorY, makeplot)
+
+    return vectorF, vector_deltaF
 
     # Linear superposition as approximation function
     #def approximation_function(x: float, k: int):
@@ -87,9 +96,34 @@ def least_squares(vectorX: list, vectorY: list, k_approx_order: int = 2, ftype: 
     #for i in range(0, n):
     #    result += (approximation_function(X[i], k) - Y[i]) ** 2
 
-def make_plot(vectorX, vectorY, vectorF, makeplot):
+def autofunc(solvec, x):
+    return sum([solvec[i] * (x ** i) for i in range(0, len(solvec))])
+
+def get_interpolated_xy_vectors(vectorX, vectorF, solution_vectorX, resolution=10):
+    """ Creates the interpolated lists of X and Y with points count specified by resolution parameter.
+    Set makeplot to true to construct the plt.plot for the splines
+    """
+    out_vectorX = list()
+    out_vectorY = list()
+
+    for i in range(0, len(vectorX) - 1):
+        current_step = (vectorX[i + 1] - vectorX[i]) / resolution
+        current_x = vectorX[i]
+        for j in range(0, resolution):
+            out_vectorY.append(autofunc(solution_vectorX, current_x))
+            out_vectorX.append(current_x)
+            current_x += current_step
+
+    # Adding the last point X and Y coords to the out_vectors
+    out_vectorX.append(vectorX[-1])
+    out_vectorY.append(vectorF[-1])
+
+    return out_vectorX, out_vectorY
+
+def make_plot(vectorX, vectorY, vectorF, interpolated_vectorX, interpolated_vectorY, makeplot):
     if makeplot:
         plt.plot(vectorX, vectorY, 'bs', vectorX, vectorF, 'g--', vectorX, vectorF, 'g^')
+        plt.plot(interpolated_vectorX, interpolated_vectorY, 'y-')
         plt.xlabel("X values")
         plt.ylabel("Y values")
         for i in range(0, len(vectorX) - 1):

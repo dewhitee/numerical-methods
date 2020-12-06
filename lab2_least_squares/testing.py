@@ -37,6 +37,13 @@ vectorF2, vector_deltaF2 = ls.least_squares(
     ftype="linear",
     makeplot=True)
 
+ls.least_squares(
+    vectorX=vectorX2,
+    vectorY=vectorY2,
+    k_approx_order=1,
+    ftype="auto",
+    makeplot=True)
+
 # print("vectorF:\n", vectorF, "\nvector_deltaF:\n", vector_deltaF)
 
 
