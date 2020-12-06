@@ -49,6 +49,14 @@ csresult.get_xy(
 
 print("Matrix cond = ", mh.get_matrix_cond(csresult.matrixA))
 
+least_squares_approx_result_0 = ls.LeastSquaresApproximator(
+    vectorX=known_vectorX_2,
+    vectorY=known_vectorY_2,
+    k_approx_order=1,
+    makeplot=False,
+    ftype="auto",
+)
+
 least_squares_approx_result_1 = ls.LeastSquaresApproximator(
     vectorX=known_vectorX_2,
     vectorY=known_vectorY_2,
@@ -88,6 +96,9 @@ plt.plot(
     csresult.get_xy()[0],
     csresult.get_xy()[1],
     "g--",
+    least_squares_approx_result_0.interpolated_vectorX,
+    least_squares_approx_result_0.interpolated_vectorY,
+    "c--",
     least_squares_approx_result_1.interpolated_vectorX,
     least_squares_approx_result_1.interpolated_vectorY,
     "r--",
@@ -106,6 +117,7 @@ plt.plot(
 plt.legend(
     [
         "Cubic-spline interpolation",
+        "Least Squares with approximation order k = 1",
         "Least Squares with approximation order k = 2",
         "Least Squares with approximation order k = 3",
         "Least Squares with approximation order k = 4",
