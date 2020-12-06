@@ -7,7 +7,7 @@ import numpy as np
 import matrix_helpers as mh
 import lab1_gauss_elimination.gauss_elimination as ge
 
-def least_squares(vectorX: list, vectorY: list, k_approx_order: int = 2, ftype: str = "linear", makeplot=False, customfunc=None, resolution=10):
+def least_squares(vectorX: list, vectorY: list, k_approx_order: int = 2, ftype: str = "auto", makeplot=False, customfunc=None, resolution=10):
     """ Calculates least squares for the choosen ftype
 
     !Returns:
@@ -17,16 +17,8 @@ def least_squares(vectorX: list, vectorY: list, k_approx_order: int = 2, ftype: 
     
     print("\nLeast Squares -------------\n")
 
+    # Set n to the size of known X vector
     n = len(vectorX)
-
-    # Initializing list of a arguments and the list of approximation functions with degree of k
-    A = list()
-    F = list()
-    k = 3
-
-    # List of x arguments
-    X = list()
-    Y = list()
 
     # Getting matrix and b coefficients vector from the power basis
     matrixA, vectorB = get_power_basis_matrix(k_approx_order, vectorX, vectorY)
@@ -49,7 +41,7 @@ def least_squares(vectorX: list, vectorY: list, k_approx_order: int = 2, ftype: 
     vector_deltaF = []
 
     # Then we need to calculate the approximation vector from the solution vector
-    # using the choosen type of approximation function (linear by default)
+    # using the choosen type of approximation function (auto by default)
     if ftype == "linear":
         print("Using linear approximation basis function")
         def linfunc(a, x): 
@@ -64,12 +56,11 @@ def least_squares(vectorX: list, vectorY: list, k_approx_order: int = 2, ftype: 
 
     elif ftype == "custom":
         print("Using custom approximation basis function")
-        # Uses the customfunc lambda to approximate given data
         vectorF = [customfunc(solution_vectorX, vectorX[i]) for i in range(0, n)]
         vector_deltaF = [(vectorY[i] - vectorF[i]) ** 2 for i in range(0, n)]
 
     elif ftype == "auto":
-        print("Using auto approximation basis function")
+        print("Using auto (default) approximation basis function")
         vectorF = [autofunc(solution_vectorX, vectorX[i]) for i in range(0, n)]
         vector_deltaF = [(vectorY[i] - vectorF[i]) ** 2 for i in range(0, n)]
 
@@ -77,24 +68,13 @@ def least_squares(vectorX: list, vectorY: list, k_approx_order: int = 2, ftype: 
     print("vectorF:\n", vectorF, "\nvector_deltaF:\n", vector_deltaF)
     print("\n--------------------------- End Least Squares")
 
+    # Getting interpolated vectors of X and Y to build smooth curve (count of points depends on the resolution parameter)
     interpolated_vectorX, interpolated_vectorY = get_interpolated_xy_vectors(vectorX, vectorF, solution_vectorX, resolution)
 
-    make_plot(vectorX, vectorY, vectorF, interpolated_vectorX, interpolated_vectorY, makeplot)
+    # Constructing the plot
+    make_plot(vectorX, vectorY, vectorF, interpolated_vectorX, interpolated_vectorY, k_approx_order, makeplot)
 
     return vectorF, vector_deltaF
-
-    # Linear superposition as approximation function
-    #def approximation_function(x: float, k: int):
-    #    result = float()
-    #    # f[m] - system of the basis functions
-    #    # k - is the approximation order
-    #    for m in range(0, k):
-    #        result += A[m] * F[m](x)
-    #    return result
-
-    #result = float()
-    #for i in range(0, n):
-    #    result += (approximation_function(X[i], k) - Y[i]) ** 2
 
 def autofunc(solvec, x):
     return sum([solvec[i] * (x ** i) for i in range(0, len(solvec))])
@@ -103,15 +83,21 @@ def get_interpolated_xy_vectors(vectorX, vectorF, solution_vectorX, resolution=1
     """ Creates the interpolated lists of X and Y with points count specified by resolution parameter.
     Set makeplot to true to construct the plt.plot for the splines
     """
+    # Initializing empty out vectors
     out_vectorX = list()
     out_vectorY = list()
 
+    # Getting values interpolated between x[i] and x[i+1] points
     for i in range(0, len(vectorX) - 1):
         current_step = (vectorX[i + 1] - vectorX[i]) / resolution
         current_x = vectorX[i]
+        # Adding each point to the out vector
         for j in range(0, resolution):
+            # Calculating interpolated Y point and adding it to the out Y vector
             out_vectorY.append(autofunc(solution_vectorX, current_x))
+            # Adding the current x (which is previous X + current step) to the out X vector
             out_vectorX.append(current_x)
+            # Adding the current step value to the current_x to get the next x value
             current_x += current_step
 
     # Adding the last point X and Y coords to the out_vectors
@@ -120,8 +106,10 @@ def get_interpolated_xy_vectors(vectorX, vectorF, solution_vectorX, resolution=1
 
     return out_vectorX, out_vectorY
 
-def make_plot(vectorX, vectorY, vectorF, interpolated_vectorX, interpolated_vectorY, makeplot):
+def make_plot(vectorX, vectorY, vectorF, interpolated_vectorX, interpolated_vectorY, k, makeplot):
     if makeplot:
+        plt.figure("Least Squares by dewhitee")
+        plt.title("Least Squares approximation with k = " + str(k))
         plt.plot(vectorX, vectorY, 'bs', vectorX, vectorF, 'g--', vectorX, vectorF, 'g^')
         plt.plot(interpolated_vectorX, interpolated_vectorY, 'y-')
         plt.xlabel("X values")
@@ -141,6 +129,9 @@ def get_power_basis_matrix(current_k: int, vectorX: list, vectorY: list):
     
     matrix construction formula:
     https://studopedia.ru/9_211036_stepennoy-bazis.html
+
+    !Returns:
+        (Wandermonde like) matrixA, vectorB 
     """
     variables_count = len(vectorX)
     out_matrix = np.ndarray(shape=(current_k + 1, current_k + 1))

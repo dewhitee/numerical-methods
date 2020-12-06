@@ -145,6 +145,9 @@ class CubicSplineInterpolator:
     def get_xy(self, resolution=10, makeplot=False, showpoints=False):
         """ Creates the interpolated lists of X and Y with points count specified by resolution parameter.
         Set makeplot to true to construct the plt.plot for the splines
+        
+        !Returns:
+            Interpolated vector X, Interpolated vector Y
         """
         self.resolution = resolution
 
@@ -188,9 +191,11 @@ class CubicSplineInterpolator:
         return self.coefficientsA[i] + self.coefficientsB[i][0] * h + self.coefficientsC[i] * (h ** 2) + self.coefficientsD[i][0] * (h ** 3)
 
     def solve_tridiagonal_matrix(self, matrixA, vectorB, vars) -> list:
-        # Solve the matrix using the Gaussian Elimination method (or tridiagonal matrix solve algorithm)
-        # Calculating C unknown coefficients vector
-        # Thomas algorithm
+        """ Solves the tridiagonal matrix using the Thomas algorithm (tridiagonal matrix algorithm)
+        
+        !Returns:
+            Vector of calculated C coefficients
+        """
         n = len(matrixA)
 
         # see https://e.tsi.lv/pluginfile.php/130692/mod_resource/content/2/%D0%A7%D0%B8%D1%81%D0%BB%D0%B5%D0%BD%D0%BD%D1%8B%D0%B5%20%D0%BC%D0%B5%D1%82%D0%BE%D0%B4%D1%8B_LECTURES-2017.pdf
@@ -220,9 +225,6 @@ class CubicSplineInterpolator:
 
         return X
 
-        #import testing2
-        #return testing2.jacobi(matrixA, vectorB, np.zeros(len(self.matrixA)), tol=1e-100, n_iterations=1000)
-
     def print_results_table(self):
         print("Cubic Spline Interpolation results table ---------------------------------------------")
         A = list(self.coefficientsA)
@@ -246,30 +248,30 @@ class CubicSplineInterpolator:
         print("--------------------------------------------------------------------------------------")
 
     def construct_tridiagonal_matrix(self):
+        """ Returns the tridiagonal matrixA with the B coefficients (vector of C unknown coefficients)
+        """
         # --- Constructing the tridiagonal matrix A as hi*ci + 2*(hi-1 + hi)*ci + hi*ci+1
 
         # Initializing the squared A matrix with zeros
-        A = np.zeros(shape=(self.points_count, self.points_count))
+        matrixA = np.zeros(shape=(self.points_count, self.points_count))
 
         # Initializing the 1D vector B with zeros
-        b = np.zeros(shape=(self.points_count, 1))
+        vectorB = np.zeros(shape=(self.points_count, 1))
 
         # Set the first element (the most upper-left element in the matrix) to 1
-        A[0, 0] = 1
+        matrixA[0, 0] = 1
 
         # Set the last element (the most lower-right element in the matrix) to 1
-        A[-1, -1] = 1
+        matrixA[-1, -1] = 1
 
         # See https://e.tsi.lv/pluginfile.php/130692/mod_resource/content/2/%D0%A7%D0%B8%D1%81%D0%BB%D0%B5%D0%BD%D0%BD%D1%8B%D0%B5%20%D0%BC%D0%B5%D1%82%D0%BE%D0%B4%D1%8B_LECTURES-2017.pdf
         for i in range(1, self.points_count - 1):
-            A[i, i-1] = self.vectorH[i-1]                   # Set lower-diagonal element
-            A[i, i+1] = self.vectorH[i]                     # Set upper-diagonal element
-            A[i, i] = 2*(self.vectorH[i-1]+self.vectorH[i]) # Set main-diagonal element
+            matrixA[i, i-1] = self.vectorH[i-1]                   # Set lower-diagonal element
+            matrixA[i, i+1] = self.vectorH[i]                     # Set upper-diagonal element
+            matrixA[i, i] = 2*(self.vectorH[i-1]+self.vectorH[i]) # Set main-diagonal element
 
             # Get vector B (C coefficients)
-            b[i, 0] = 3*(self.deltaY[i]/self.vectorH[i] - self.deltaY[i-1]/self.vectorH[i-1])
+            vectorB[i, 0] = 3*(self.deltaY[i]/self.vectorH[i] - self.deltaY[i-1]/self.vectorH[i-1])
 
-        # Returning matrixA and vectorB. 
-        # Converting them to list, because ndarray from numpy don't have an append method, which is required in the call of gauss_elimination
-        return A, b
+        return matrixA, vectorB
 

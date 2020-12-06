@@ -6,6 +6,7 @@ from scipy.interpolate import interp1d
 
 import numpy as np
 import matplotlib.pyplot as plt
+import matrix_helpers as mh
 
 vars = ['x1', 'x2', 'x3', 'x4', 'x5']
 known_vectorX = [0, 3.3, 6.6, 9.9]
@@ -32,31 +33,22 @@ least_squares_approx_result = ls.least_squares(
     ftype="linear"
 )
 
-#cs = CubicSpline(known_vectorX, known_vectorY, bc_type='natural')
-#print("S(0)", cs(0))
-#print("S(3.3)", cs(3.3))
-
-#plt.plot()
-
-
-#def fun_rosenbrock(x):
-#    return np.array([10 * (x[1] - x[0]**2), (1 - x[0])])
-
-#from scipy.optimize import least_squares
-#res_1 = least_squares(fun_rosenbrock, known_vectorX)
-
 known_vectorX_2 = [0, 3.3, 6.6, 9.9]
 known_vectorY_2 = [12.1, 15.9, 12.4, 13.4]
 
-si.CubicSplineInterpolator(
+csresult = si.CubicSplineInterpolator(
     known_vectorX=known_vectorX_2,
     known_vectorY=known_vectorY_2,
     vars=None,
     known_points=None
-).get_xy(
+)
+
+csresult.get_xy(
     resolution=30,
     makeplot=True
 )
+
+print("Matrix cond = ", mh.get_matrix_cond(csresult.matrixA))
 
 least_squares_approx_result_2 = ls.least_squares(
     vectorX=known_vectorX_2,
@@ -73,3 +65,4 @@ least_squares_approx_result_2 = ls.least_squares(
     makeplot=True,
     ftype="auto"
 )
+
