@@ -25,7 +25,7 @@ known_vectorY = [2.1, 5.9, 2.4, 3.4]
 #)
 #print("interpolatedX:\n", interpolatedX, "\ninterpolatedY:\n", interpolatedY)
 
-least_squares_approx_result = ls.least_squares(
+least_squares_approx_result = ls.LeastSquaresApproximator(
     vectorX=known_vectorX,
     vectorY=known_vectorY,
     k_approx_order=1,
@@ -50,7 +50,7 @@ csresult.get_xy(
 
 print("Matrix cond = ", mh.get_matrix_cond(csresult.matrixA))
 
-least_squares_approx_result_2 = ls.least_squares(
+least_squares_approx_result_2 = ls.LeastSquaresApproximator(
     vectorX=known_vectorX_2,
     vectorY=known_vectorY_2,
     k_approx_order=2,
@@ -58,11 +58,15 @@ least_squares_approx_result_2 = ls.least_squares(
     ftype="auto",
 )
 
-least_squares_approx_result_2 = ls.least_squares(
+least_squares_approx_result_2 = ls.LeastSquaresApproximator(
     vectorX=known_vectorX_2,
     vectorY=known_vectorY_2,
     k_approx_order=3,
     makeplot=True,
-    ftype="auto"
+    ftype="auto",
+    resolution=20
 )
+
+# ------------- LAB 2 GRAPHICAL COMPARISON
+
 

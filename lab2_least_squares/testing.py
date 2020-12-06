@@ -30,19 +30,20 @@ vectorY2 = [5.3, 6.3, 4.8, 3.8, 3.3]
 #     matrix=whole_matrix, 
 #     vars=vars, 
 #     matrix_name="Matrix2")
-vectorF2, vector_deltaF2 = ls.least_squares(
+ls.LeastSquaresApproximator(
     vectorX=vectorX2,
     vectorY=vectorY2,
     k_approx_order=1,
     ftype="linear",
     makeplot=True)
 
-ls.least_squares(
+ls.LeastSquaresApproximator(
     vectorX=vectorX2,
     vectorY=vectorY2,
     k_approx_order=1,
     ftype="auto",
-    makeplot=True)
+    makeplot=True
+)
 
 # print("vectorF:\n", vectorF, "\nvector_deltaF:\n", vector_deltaF)
 
