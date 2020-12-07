@@ -7,7 +7,7 @@ import copy
 #
 # ...
 class GaussElimination:
-    def __init__(self, matrixAB: list, vars: list, print_only_results: bool = False, matrix_name: str = "", matrixA=None, vectorB=None):
+    def __init__(self, matrixAB: list, vars: list, print_only_results: bool = False, matrix_name: str = "", matrixA=None, vectorB=None, print_results=True, without_print=False):
         """
         returns list of solution variables X
         """
@@ -19,11 +19,12 @@ class GaussElimination:
             for (var, row) in zip(vars, matrix_copy):
                 print(var, *["%0.4f" % elem for elem in row], sep='\t')
 
-        print('\n-------------------------------------Gauss Elimination - ' + matrix_name)
-        if not print_only_results:
+        if not without_print:
+            print('\n-------------------------------------Gauss Elimination - ' + matrix_name)
             print('Length of the matrix (n):', self.matrix_len)
-            print('Matrix before pivotisation (initial):\n')
-            print_matrix()
+            if not print_only_results:
+                print('Matrix before pivotisation (initial):\n')
+                print_matrix()
 
         # Find the pivot element - we need to put it as the first row in the matrix
         for i in range(self.matrix_len):
@@ -33,7 +34,7 @@ class GaussElimination:
                         # Swapping elements
                         matrix_copy[i][j], matrix_copy[k][j] = matrix_copy[k][j], matrix_copy[i][j]
 
-        if not print_only_results:
+        if not without_print and not print_only_results:
             print('\nMatrix after pivotisation:\n')
             print_matrix()
 
@@ -48,7 +49,7 @@ class GaussElimination:
                 for j in range(0, self.matrix_len + 1):
                     matrix_copy[k][j] -= coefficient * matrix_copy[i][j]
 
-        if not print_only_results:
+        if not without_print and not print_only_results:
             print('\nMatrix after gauss elimination:\n')
             print_matrix()
 
@@ -72,10 +73,11 @@ class GaussElimination:
             # to be calculated
             vars_values[i] /= matrix_copy[i][i]
 
-        print('\nSolution:')
-        for (var, val) in zip(vars, vars_values):
-            print(var, '= %0.4f' %(val))
-        print('-------------------------------------\n')
+        if not without_print and print_results:
+            print('\nSolution:')
+            for (var, val) in zip(vars, vars_values):
+                print(var, '= %0.4f' %(val))
+            print('-------------------------------------\n')
 
         self.vars_values = vars_values
         self.matrix_copy = matrix_copy

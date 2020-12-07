@@ -87,7 +87,7 @@ def get_matrix_norm(matrixA: list) -> float:
         #result = max(result, temp)
         #result = max(result, get_vector_norm_euc(matrixA[i]))
         for row in matrixA:
-            print(row[i])
+            #print(row[i])
             temp += abs(row[i])
             colsum += (row[i] ** 2)
         result = max(result, temp)

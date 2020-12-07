@@ -2,7 +2,7 @@ import matrix_helpers as mh
 import numpy as np
 
 class ConditionNumber:
-    def __init__(self, matrixAB=None, matrixA=None, vectorB=None):
+    def __init__(self, matrixAB=None, matrixA=None, vectorB=None, print_result=False):
         self.whole_matrix = matrixAB
 
         if matrixAB is None:
@@ -17,6 +17,9 @@ class ConditionNumber:
             self.cond = mh.get_matrix_cond(matrixA)
         else:
             self.cond = mh.get_matrix_cond(mh.get_matrixA(matrixAB))
+
+        if print_result:
+            print("Condition number of matrix Cond(A) =", self.cond)
         
     def experimental(self, vectorX, delta_vectorX, printall=False):
         print("\n--- Experimental condition number check")

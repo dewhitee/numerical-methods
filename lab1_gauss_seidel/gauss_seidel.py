@@ -1,3 +1,5 @@
+import copy
+
 # Algorithm
 # 1. Start
 # 2. Arrange given system of linear equations in diagonally dominant form
@@ -12,7 +14,8 @@
 # 9. Print value of x1, y1, z1 and so on
 # 10. Stop
 class GaussSeidel:
-    def __init__(self, equations: list, vars: list, e: float, print_only_results: bool = False, matrix_name: str = "", matrixAB: list = None) -> list:
+    def __init__(self, equations: list, vars: list, e: float, print_only_results: bool = False, matrix_name: str = "", matrixAB: list = None, 
+    print_results=True, without_print=False, max_iterations=1000, show_errors_list=False, auto_adjust_matrix=True):
         """ 
         equations -- list of lambda equations with any count of arguments.
         Example: [lambda x, y: x + y, lambda x, y: x - y]
@@ -34,11 +37,12 @@ class GaussSeidel:
         #e = float(input('Enter tolerable error: '))
 
         # Implementation of Gauss Seidel Iteration
-        print('\n-------------------------------------Gauss Seidel - ' + matrix_name)
-        print('Using equations list...') if matrixAB is None else print ('Using matrix...')
-        print('With accuracy of ' + str(e) + '\n')
-        if not print_only_results:
-            print('Iter', *vars, sep = "\t")
+        if not without_print:
+            print('\n-------------------------------------Gauss Seidel - ' + matrix_name)
+            print('Using equations list...') if matrixAB is None else print ('Using matrix...')
+            print('With accuracy of ' + str(e) + '\n')
+            if not print_only_results:
+                print('Iter', *[f'{v:<12}' for v in vars], sep="\t")
 
         condition = True
 
@@ -46,32 +50,42 @@ class GaussSeidel:
         # or set each X as B if using matrix, as the first approximation
         vars_values = [0] * len(equations) if matrixAB is None else [row[-1] for row in matrixAB]
 
-        if not print_only_results:
-            print(0, *["%0.4f" % elem for elem in vars_values], sep="\t")
+        if not without_print and not print_only_results:
+            print(0, *[f'{"%0.4f":<12}' % elem for elem in vars_values], sep="\t")
 
         iteration = 1
+
+        adjusted_matrixAB = self.adjust_matrix(matrixAB) if auto_adjust_matrix else matrixAB
+        print("Adjusted matrix:\n", adjusted_matrixAB)
 
         while condition:
             e_list = []
 
             # Calculating all variables
-            if matrixAB is None:
+            if adjusted_matrixAB is None:
                 self.iterate_equations(equations, e_list, vars_values)
             else:
-                self.iterate_matrix(matrixAB, e_list, vars_values)
+                self.iterate_matrix(adjusted_matrixAB, e_list, vars_values)
 
-            if not print_only_results:
-                print(iteration, *["%0.4f" % elem for elem in vars_values], sep="\t")
+            if not without_print and not print_only_results:
+                print(iteration, *[f'{"%0.4f":<12}' % elem for elem in vars_values], sep="\t")
             iteration += 1
+
+            if show_errors_list:
+                print("Errors:", *[f'{"%0.4f":<12}' % elem for elem in e_list], sep="\t")
 
             # Checking if all current errors are greater than required error e
             condition = self.check_error_rate(e_list, e)
 
-        print('\nSolution:')
-        for (var, val) in zip(vars, vars_values):
-            print(var,'= %0.3f' %(val))
+            if iteration > max_iterations:
+                break
 
-        print('-------------------------------------\n')
+        if not without_print:
+            print('\nSolution:')
+            for (var, val) in zip(vars, vars_values):
+                print(var,'= %0.3f' %(val))
+            print('-------------------------------------\n')
+
         self.vars_values = vars_values
         self.solution_vectorX = vars_values
 
@@ -109,6 +123,38 @@ class GaussSeidel:
 
     def check_error_rate(self, e_list: list, e):
         return all([current_e > e for current_e in e_list])
+
+    def adjust_matrix(self, matrixAB):
+        """ Returns the matrixAB with all rows placed in such way,
+        that main diagonal has largest values by module
+        """
+        if matrixAB is None:
+            return None
+
+        out_matrix = copy.deepcopy(matrixAB)
+        for i, row in enumerate(out_matrix):
+            current_max = 0
+            current_max_index = 0
+
+            # Iterating over the i-th column values
+            for j in range(i, len(out_matrix)):
+                #print(abs(current_max), "<", abs(out_matrix[j][i]))
+                if abs(current_max) < abs(out_matrix[j][i]):
+                    current_max = out_matrix[j][i]
+                    current_max_index = j
+
+            #print("Current max list is: ",
+            #      out_matrix[current_max_index], "with index", current_max_index)
+
+            # Swap max row with the current row
+            out_matrix[i], out_matrix[current_max_index] = out_matrix[current_max_index], out_matrix[i]
+
+        return out_matrix
+
+            
+
+
+
 
 # Testing
 
