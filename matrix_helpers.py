@@ -3,50 +3,51 @@ import math
 import lab1_gauss_elimination.gauss_elimination as ge
 import lab1_gauss_seidel.gauss_seidel as gs
 from numpy import array
+import summary
 
-def get_matrix_determinant(matrix: list) -> float:
-    return np.linalg.det(matrix)
+def get_matrix_determinant(matrixA: list) -> float:
+    return np.linalg.det(matrixA)
 
-def get_matrix_inversed(matrix: list) -> list:
-    return np.linalg.inv(matrix)
+def get_matrix_inversed(matrixA: list) -> list:
+    return np.linalg.inv(matrixA)
 
-def get_matrix_cond(matrix: list) -> float:
+def get_matrix_cond(matrixA: list) -> float:
     """ Returns the condition number of the matrix.
     Calculated as ||A|| * ||A^-1|| or ||matrix_norm|| * ||inversed_matrix_norm||
     """
-    return get_matrix_norm(matrix) * get_matrix_norm(get_matrix_inversed(matrix))
+    return get_matrix_norm(matrixA) * get_matrix_norm(get_matrix_inversed(matrixA))
 
-def get_matrixA(matrix: list) -> list:
+def get_matrixA(matrixAB: list) -> list:
     """ Returns the matrixA from the whole matrix
     """
-    return [row[:-1] for row in matrix]
+    return [row[:-1] for row in matrixAB]
 
-def get_matrixAX(matrix: list, vectorX: list):
+def get_matrixAX(matrixA: list, vectorX: list):
     """ Returns the matrixA multiplied by the answers vectorX
     """
-    return np.multiply(get_matrixA(matrix), vectorX)
+    return np.multiply(get_matrixA(matrixA), vectorX)
 
-def show_A_B(matrix: list):
-    print("\nA", f'{"B":>{len(matrix) * 16 + 1}}')
-    for (a, b) in zip(get_matrixA(matrix), get_vectorB_unpacked(matrix)):
+def show_A_B(matrixAB: list):
+    print("\nA", f'{"B":>{len(matrixAB) * 16 + 1}}')
+    for (a, b) in zip(get_matrixA(matrixAB), get_vectorB_unpacked(matrixAB)):
         print(*['{:10}'.format("%0.4f" % elem) for elem in a], "| " + '{:>2}'.format("%0.4f" % b), sep="\t")
 
-def show_AX_B(matrix: list, vectorX: list):
+def show_AX_B(matrixAB: list, vectorX: list):
     print(f'\n{"AX":<16} {"B":<16}')
-    matrix_AX = get_matrixAX(matrix, vectorX)
-    for (ax, b) in zip(sum_matrix_to_vector(matrix_AX), get_vectorB_unpacked(matrix)):
+    matrix_AX = get_matrixAX(matrixAB, vectorX)
+    for (ax, b) in zip(sum_matrix_to_vector(matrix_AX), get_vectorB_unpacked(matrixAB)):
         print(f'{"%0.4f" % ax:<16} {"%0.4f" % b:<16}')
 
-def get_vectorB(matrix: list) -> list:
+def get_vectorB(matrixAB: list) -> list:
     """ Returns the vectorB from the whole matrix as the new matrix with each element as list
     as: [[1], [5], [3.6]]
     """
-    return [row[-1:] for row in matrix]
+    return [row[-1:] for row in matrixAB]
 
-def get_vectorB_unpacked(matrix: list) -> list:
+def get_vectorB_unpacked(matrixAB: list) -> list:
     """ Returns the vectorB from the whole matrix as: [1, 5, 3.6]
     """
-    return [row[0] for row in get_vectorB(matrix)]
+    return [row[0] for row in get_vectorB(matrixAB)]
 
 def unpack_vector(v: list) -> list:
     """
@@ -54,7 +55,7 @@ def unpack_vector(v: list) -> list:
     return [row[0] for row in v]
 
 def get_whole_matrix(matrixA: np.ndarray, vectorB: np.ndarray):
-    return only_append_vectorB(matrixA.tolist(), unpack_vector(vectorB.tolist()))
+    return append_vectorB_to_matrixA(matrixA.tolist(), unpack_vector(vectorB.tolist()))
 
 def get_vector_norm_euc(vec: list) -> float:
     """ Calculates the norm of the vector by the Euclidean formula.
@@ -72,82 +73,80 @@ def get_vector_norm_man(vec: list) -> float:
         elem += abs(elem)
     return result
 
-def get_matrix_norm(matrix: list) -> float:
+def get_matrix_norm(matrixA: list) -> float:
     """
     returns || matrix ||_1 = max || matrix-col ||
     """
     result = float()
-    for i in range(0, len(matrix)):
+    colsum = float()
+    for i in range(0, len(matrixA[0])):
         temp = float()
-        for row in matrix:
-            #print(row[i])
+        #for row in matrixA:
+        #    #print(row[i])
+        #    temp += abs(row[i])
+        #result = max(result, temp)
+        #result = max(result, get_vector_norm_euc(matrixA[i]))
+        for row in matrixA:
+            print(row[i])
             temp += abs(row[i])
+            colsum += (row[i] ** 2)
         result = max(result, temp)
+        colsum += temp
+    #print("Max value of matrixA columns was:", result, "\nSquare root of a ** 2 was:", math.sqrt(colsum))
     return result
 
 
-def get_matrix_norm_inversed(matrix: list) -> float:
+def get_matrix_norm_inversed(matrixA: list) -> float:
     """
     returns || matrix ||_infinity = max || matrix-row ||
     """
     result = float()
-    for row in matrix:
+    for row in matrixA:
         result = max(result, sum(np.abs(row)))
     return result
 
-def sum_matrix_to_vector(matrix: list) -> list:
+def sum_matrix_to_vector(any_matrix: list) -> list:
     """ Function sums each row of the matrix and returns the vector of them
     """
-    return [sum(row) for row in matrix]
+    return [sum(row) for row in any_matrix]
 
-def only_append_vectorB(matrixA: list, vectorB: list) -> list:
-    """ This functions just appends each element of vectorB to the same row of matrixA
+def append_vectorB_to_matrixA(matrixA: list, vectorB: list) -> list:
+    """ This function gets the matrixA, and returns the matrixA 
+    with appended specified vectorB
     """
     for i, elem in enumerate(vectorB):
         matrixA[i].append(elem)
     return matrixA
 
-def append_vectorB_to_whole_matrix(matrix: list, vectorB: list) -> list:
+def append_vectorB_to_whole_matrix(matrixAB: list, vectorB: list) -> list:
     """ This function gets the whole matrix, finds the matrixA and
     returns the matrixA with the specified vectorB as the NEW whole matrix
     """
-    matrixA = get_matrixA(matrix)
+    matrixA = get_matrixA(matrixAB)
     for i, elem in enumerate(vectorB):
         matrixA[i].append(elem)
     return matrixA
 
-def check_condition_number(matrix: list, vectorX: list, deltaX: list) -> bool:
-    """ Finds the condition number of the matrix as well as norm of the answers vector X  
-    and delta vector X, norm of the coefficient vector B and delta vector B.
-    Checks condition: cond(A) >= (deltaX_norm / vectorX_norm) * (vectorB_norm / deltaB_norm)
-    """
-    condA = get_matrix_cond(get_matrixA(matrix))
-    vectorB_norm = get_vector_norm_euc(get_vectorB_unpacked(matrix))
-    deltaB_norm = get_vector_norm_euc(get_deltaB(matrix))
-    vectorX_norm = get_vector_norm_euc(vectorX)
-    deltaX_norm = get_vector_norm_euc(deltaX)
-    print("Matrix determinant =", get_matrix_determinant(get_matrixA(matrix)))
-    print("Checking Cond(A) for matrix:")
-    print(condA, ">= (", deltaX_norm, "/", vectorX_norm, ") * (", vectorB_norm, "/", deltaB_norm, ")")
-    print(condA, ">=", (deltaX_norm / vectorX_norm) * (vectorB_norm / deltaB_norm))
-    condition = condA >= (deltaX_norm / vectorX_norm) * (vectorB_norm / deltaB_norm)
-    print("Condition returned", condition)
-    print("Condition number of matrix Cond(A) =", condA)
-    if condA < 10:
-        print("Cond(A) of the matrix falls into 1-10 range. This means that the results of this matrix calculation are adequate.")
-    elif condA < 1000:
-        print("Cond(A) of the matrix falls into 10-1000 range. This means that the results of this matrix calculation CAN BE INADEQUATE.")
-    elif condA > 1000:
-        print("Cond(A) of the matrix falls into 1000-infinity range. This means that the results of this matrix calculation ARE INADEQUATE.")
-    return condition
-
-def get_deltaB(matrix: list) -> list:
+def get_deltaB_from_vectorB(vectorB: list):
     """ DeltaB is the B vector with artificially added error.
     Is computed by finding the max element in B vector and multipling it by 0.01 (1%)
     All other elements of the B vector will be null, meaning that there will be the only
     one variable with the none-zero value in the whole out B vector.
     """
-    vectorB = get_vectorB_unpacked(matrix)
+    deltaB = list()
+    largest = max(vectorB)
+    #print("Largest value of vectorB =", largest)
+    for elem in vectorB:
+        deltaB.append(elem * 0.01 if elem == largest else 0)
+    return deltaB
+
+def get_deltaB_from_whole_matrix(matrixAB: list) -> list:
+    """ DeltaB is the B vector with artificially added error.
+    Is computed by finding the max element in B vector and multipling it by 0.01 (1%)
+    All other elements of the B vector will be null, meaning that there will be the only
+    one variable with the none-zero value in the whole out B vector.
+    """
+    vectorB = get_vectorB_unpacked(matrixAB)
     deltaB = list()
     largest = max(vectorB)
     print("Largest value of vectorB =", largest)
@@ -161,15 +160,15 @@ def get_deltaX(vectorX: list, vector_deltaX: list) -> list:
     """
     return vectorX - vector_deltaX
 
-def full_print(matrix: list, vars: list, title: str):
+def full_print(matrixAB: list, vars: list, title: str):
     """ Prints the whole matrix with the custom title
     """
     print("\n"+title+" matrix:")
     if vars is not None:
-        for (var, row) in zip(vars, matrix):
+        for (var, row) in zip(vars, matrixAB):
             print(var, *["%0.4f" % elem for elem in row], sep='\t  ')
     else:
-        for row in matrix:
+        for row in matrixAB:
             print(*["%0.4f" % elem for elem in row], sep='\t  ')
 
 def A_print(matrix: list, vars: list):
@@ -181,11 +180,11 @@ def A_print(matrix: list, vars: list):
         print(var, *["%0.4f" % elem for elem in row], sep='\t  ')
 
 
-def B_print(matrix: list, vars: list):
+def B_print(matrixAB: list, vars: list):
     """ Prints the coefficient vectorB of the specified whole matrix
     """
     print("\nB vector:")
-    vectorB = [row[-1:] for row in matrix]
+    vectorB = [row[-1:] for row in matrixAB]
     if vars is not None:
         for (var, row) in zip(vars, vectorB):
             print(var, *["%0.4f" % elem for elem in row], sep='\t  ')
@@ -201,77 +200,52 @@ def X_print(vectorX: list, vars: list):
         print(var, '= %0.4f' % (val))
 
 
-def solve_with_gauss_elimination(matrix: list, vars: list, print_only_results: bool = False, matrix_name: str = ""):
+def solve_with_gauss_elimination(matrixAB: list, vars: list, print_only_results: bool = False, matrix_name: str = ""):
     """ Solves the specified matrix using the Gauss Elimination
     """
-    vectorX = ge.gauss_elimination(matrix, vars, print_only_results, matrix_name)
-    summary_data = summary(matrix, vars, vectorX, print_only_results, matrix_name)
-    summary_gauss_elimination(summary_data)
-    return summary_data
+    matrix_vectorX = ge.GaussElimination(
+        matrixAB=matrixAB, 
+        vars=vars,
+        print_only_results=print_only_results,
+        matrix_name=matrix_name).solution_vectorX
 
-def solve_with_gauss_seidel(matrix: list, equations: list, vars: list, e: float, print_only_results: bool = False, 
+    adjusted_matrix = get_adjusted_matrix(get_matrixA(matrixAB), get_vectorB_unpacked(matrixAB))
+    summary.Summary(
+        matrixAB=matrixAB, 
+        adjusted_matrix=adjusted_matrix, 
+        vars=vars, 
+        X=matrix_vectorX,
+        print_only_results=print_only_results,
+        matrix_name=matrix_name).compare_with_adjusted_gauss_elimination(
+            printall=True
+        )
+
+def solve_with_gauss_seidel(matrixAB: list, equations: list, vars: list, e: float, print_only_results: bool = False, 
 matrix_name: str = "", use_matrix: bool = False):
     """ Solve the specified equations using the Gauss Seidel
     """
-    vectorX = gs.gauss_seidel(equations, vars, e, print_only_results, matrix_name, matrix if use_matrix else None)
-    summary_data = summary(matrix, vars, vectorX, print_only_results, matrix_name)
-    summary_data.add_equations(equations)
-    summary_data.add_errors_vec(e)
-    summary_data.set_use_matrix(use_matrix)
-    summary_gauss_seidel(summary_data)
-    return summary_data
+    matrix_vectorX = gs.GaussSeidel(
+        matrixAB=matrixAB,
+        equations=equations, 
+        vars=vars, 
+        e=e, 
+        print_only_results=print_only_results, 
+        matrix_name=matrix_name).solution_vectorX
 
-class SummaryData:
-    def __init__(self, matrix: list, adjusted_matrix: list, vars: list, X: list, AX: list, 
-    B: list, condA: float, deltaB: list, print_only_results: bool = False, matrix_name: str = ""):
-        self.matrix = matrix
-        self.adjusted_matrix = adjusted_matrix
-        self.vars = vars
-        self.X = X
-        self.AX = AX
-        self.B = B
-        self.condA = condA
-        self.deltaB = deltaB
-        self.print_only_results = print_only_results
-        self.matrix_name = matrix_name
+    adjusted_matrix = get_adjusted_matrix(get_matrixA(matrixAB), get_vectorB_unpacked(matrixAB))
+    summary.Summary(
+        matrixAB=matrixAB,
+        adjusted_matrix=adjusted_matrix,
+        vars=vars,
+        X=matrix_vectorX,
+        print_only_results=print_only_results,
+        matrix_name=matrix_name).compare_with_adjusted_gauss_seidel(
+            equations=equations,
+            e=e,
+            use_matrix=True,
+            printall=True
+        )
 
-    def add_equations(self, equations: list):
-        self.equations = equations
-
-    def add_errors_vec(self, e: list):
-        self.e = e
-
-    def set_use_matrix(self, use_matrix: bool):
-        self.use_matrix = use_matrix
-
-def summary(matrix: list, vars: list, vectorX: list, print_only_results: bool = False, matrix_name: str = "") -> SummaryData:
-    """ Summarizes the data available after solving the matrix
-    """
-    if not print_only_results:
-        show_A_B(matrix)
-    AX = get_matrixAX(matrix, vectorX)
-    B = get_vectorB_unpacked(matrix)
-    if not print_only_results:
-        show_AX_B(matrix, vectorX)
-    condA = get_matrix_cond(get_matrixA(matrix))
-    print("\nCondition number Cond(A) of this matrix is =", condA)
-    deltaB = get_deltaB(matrix)
-    print("\nDeltaB vector:", deltaB)
-    adjusted_matrix = append_vectorB_to_whole_matrix(matrix, array(B) + array(deltaB))
-    if not print_only_results:
-        full_print(adjusted_matrix, vars, 'Modified (adjusted) matrix')
-
-    return SummaryData(matrix, adjusted_matrix, vars, vectorX, AX, B, condA, deltaB, print_only_results, matrix_name)
-
-def summary_gauss_elimination(data: SummaryData):
-    deltaX = ge.gauss_elimination(data.adjusted_matrix, data.vars, data.print_only_results, data.matrix_name + " with B + deltaB")
-    if not data.print_only_results:
-        print("DeltaX vector = ", deltaX)
-    check_condition_number(data.matrix, data.X, deltaX)
-
-def summary_gauss_seidel(data: SummaryData):
-    deltaX = gs.gauss_seidel(data.equations, data.vars, data.e, data.print_only_results, 
-                             data.matrix_name + " with B + deltaB", data.adjusted_matrix if data.use_matrix else None)
-    if not data.print_only_results:
-        print("DeltaX vector = ", deltaX)
-    check_condition_number(data.matrix, data.X, deltaX)
+def get_adjusted_matrix(matrixA, vectorB):
+    return append_vectorB_to_matrixA(
+        matrixA, array(vectorB) + array(get_deltaB_from_vectorB(vectorB)))

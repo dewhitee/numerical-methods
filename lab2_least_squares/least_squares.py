@@ -30,14 +30,15 @@ class LeastSquaresApproximator:
         self.matrixA, self.vectorB = self.get_power_basis_matrix()
 
         # Making the one whole matrix from the matrixA and vectorB to pass into the Gauss Elimination solving function
-        self.whole_matrix = mh.only_append_vectorB(
+        self.matrixAB = mh.append_vectorB_to_matrixA(
             self.matrixA.tolist(), mh.unpack_vector(self.vectorB.tolist()))
 
         # Solving matrix with Gauss Elimination, getting the X vector of solutions for power basis matrix
-        self.solution_vectorX = ge.gauss_elimination(
-            matrix=self.whole_matrix, 
+        self.solution_vectorX = ge.GaussElimination(
+            matrixAB=self.matrixAB,
             vars=['x'+str(i) for i in range(0, self.n)],
-            matrix_name="")
+            matrix_name="",
+            print_only_results=True).solution_vectorX
 
         print("solution_vectorX = ", self.solution_vectorX)
         print("vectorX[0]=",self.vectorX[0])

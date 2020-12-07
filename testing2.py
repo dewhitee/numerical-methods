@@ -17,16 +17,18 @@ test_1_matrix = [
 
 test_1_vars = ['x1', 'x2', 'x3', 'x4']
 
+print(np.linalg.cond(mh.get_matrixA(test_1_matrix)))
+
 # -----
 mh.solve_with_gauss_elimination(
-    matrix=test_1_matrix, 
+    matrixAB=test_1_matrix, 
     vars=test_1_vars, 
-    print_only_results=False, 
+    print_only_results=True, 
     matrix_name="Initial matrix")
 
 # -----
 mh.solve_with_gauss_seidel(
-    matrix=test_1_matrix, 
+    matrixAB=test_1_matrix, 
     equations=test_1_equations, 
     vars=test_1_vars, e=0.001, 
     print_only_results=True, 
