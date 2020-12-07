@@ -8,8 +8,13 @@ import matrix_helpers as mh
 import lab1_gauss_elimination.gauss_elimination as ge
 
 class LeastSquaresApproximator:
-    def __init__(self, vectorX: list, vectorY: list, k_approx_order: int = 2, ftype: str = "auto", makeplot=False, customfunc=None, resolution=10):
-        """ Calculates least squares for the choosen ftype
+    def __init__(self, vectorX: list, vectorY: list, k_approx_order: int = 2, ftype: str = "auto", makeplot=False, customfunc=None, resolution=10,
+    print_matrix=False, customstep=None):
+        """ Calculates least squares for the choosen ftype. Set makeplot to true to construct the plt.plot for the splines
+
+        customfunc: Can be specified to use instead of default autofunc
+
+        customstep: Can be specified to be used instead of the current_step ( (next X - current X) / resolution )
 
         !Returns:
             vectorF,
@@ -22,12 +27,23 @@ class LeastSquaresApproximator:
         self.resolution = resolution
         self.vectorX = vectorX
         self.vectorY = vectorY
+        self.customfunc = customfunc
+        self.customstep = customstep
 
         # Set n to the size of known X vector
         self.n = len(vectorX)
 
         # Getting matrix and b coefficients vector from the power basis
         self.matrixA, self.vectorB = self.get_power_basis_matrix()
+
+        # Print the newly created power basis matrix if necessary
+        if print_matrix:
+            mh.full_print(
+                mh.append_vectorB_to_matrixA(
+                    matrixA=self.matrixA.tolist(), 
+                    vectorB=mh.unpack_vector(self.vectorB.tolist())),
+                    vars=['x'+str(i) for i in range(0, self.n)], 
+                    title="Power basis matrix with k = " + str(k_approx_order))
 
         # Making the one whole matrix from the matrixA and vectorB to pass into the Gauss Elimination solving function
         self.matrixAB = mh.append_vectorB_to_matrixA(
@@ -89,7 +105,6 @@ class LeastSquaresApproximator:
 
     def get_interpolated_xy_vectors(self):
         """ Creates the interpolated lists of X and Y with points count specified by resolution parameter.
-        Set makeplot to true to construct the plt.plot for the splines
         """
         # Initializing empty out vectors
         out_vectorX = list()
@@ -97,12 +112,13 @@ class LeastSquaresApproximator:
 
         # Getting values interpolated between x[i] and x[i+1] points
         for i in range(0, len(self.vectorX) - 1):
-            current_step = (self.vectorX[i + 1] - self.vectorX[i]) / self.resolution
+            current_step = (self.vectorX[i + 1] - self.vectorX[i]) / self.resolution if self.customstep is None else self.customstep
             current_x = self.vectorX[i]
             # Adding each point to the out vector
             for j in range(0, self.resolution):
                 # Calculating interpolated Y point and adding it to the out Y vector
-                out_vectorY.append(self.autofunc(self.solution_vectorX, current_x))
+                out_vectorY.append(self.autofunc(self.solution_vectorX, current_x) 
+                    if self.customfunc is None else self.customfunc(self.solution_vectorX, current_x))
                 # Adding the current x (which is previous X + current step) to the out X vector
                 out_vectorX.append(current_x)
                 # Adding the current step value to the current_x to get the next x value
@@ -123,7 +139,7 @@ class LeastSquaresApproximator:
         plt.ylabel("Y values")
         for i in range(0, len(self.vectorX) - 1):
             plt.plot([self.vectorX[i], self.vectorX[i]], [self.vectorY[i], self.vectorF[i]], 'r--')
-
+        plt.plot([self.vectorX[-1], self.vectorX[-1]], [self.vectorY[-1], self.vectorF[-1]], 'r--')
         plt.show()
 
     def get_power_basis_matrix(self):

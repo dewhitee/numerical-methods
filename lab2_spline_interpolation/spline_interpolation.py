@@ -9,7 +9,7 @@ import matrix_helpers as mh
 
 class CubicSplineInterpolator:
 
-    def __init__(self, known_vectorX: list, known_vectorY: list, known_points: list, vars = []):
+    def __init__(self, known_vectorX: list, known_vectorY: list, known_points: list=None, vars = []):
         """ 
         known_points -- is the list of pairs of the points (nodes) that are known at the start
 
