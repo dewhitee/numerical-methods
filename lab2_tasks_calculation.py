@@ -1,3 +1,4 @@
+import timeit
 import lab2_spline_interpolation.spline_interpolation as si
 import lab2_least_squares.least_squares as ls
 from matplotlib import pyplot as plt
@@ -171,3 +172,57 @@ plt.legend(
 plt.xlabel("X values")
 plt.ylabel("Y values")
 plt.show()
+
+
+def cubic_spline_0():
+    si.CubicSplineInterpolator(
+        known_vectorX=known_vectorX,
+        known_vectorY=known_vectorY,
+        known_points=None,
+        vars=None,
+        without_print=True
+    )
+
+
+def least_squares_0():
+    least_squares_approx_result_1 = ls.LeastSquaresApproximator(
+        vectorX=known_vectorX,
+        vectorY=known_vectorY,
+        k_approx_order=2,
+        makeplot=False,
+        resolution=10,
+        without_print=True
+    )
+
+
+def least_squares_1():
+    least_squares_approx_result_1 = ls.LeastSquaresApproximator(
+        vectorX=known_vectorX,
+        vectorY=known_vectorY,
+        k_approx_order=3,
+        makeplot=False,
+        resolution=10,
+        print_matrix=False,
+        without_print=True
+    )
+
+
+def least_squares_2():
+    least_squares_approx_result_1 = ls.LeastSquaresApproximator(
+        vectorX=known_vectorX,
+        vectorY=known_vectorY,
+        k_approx_order=5,
+        makeplot=False,
+        resolution=10,
+        without_print=True
+    )
+
+
+print("Cubic Spline Interpolation - time elapsed\n(number of calls = 10000):\n", timeit.timeit("cubic_spline_0()",
+    setup="from __main__ import cubic_spline_0", number=10000), 'seconds \n')
+print("Least Squares Approximation with k = 2 - time elapsed\n (number of calls = 10000):\n", timeit.timeit('least_squares_0()',
+    setup="from __main__ import least_squares_0", number=10000), 'seconds\n')
+print("Least Squares Approximation with k = 3 - time elapsed\n (number of calls = 10000):\n", timeit.timeit('least_squares_1()',
+    setup="from __main__ import least_squares_1", number=10000), 'seconds\n')
+print("Least Squares Approximation with k = 5 - time elapsed\n (number of calls = 10000):\n", timeit.timeit('least_squares_2()',
+    setup="from __main__ import least_squares_2", number=10000), 'seconds\n')

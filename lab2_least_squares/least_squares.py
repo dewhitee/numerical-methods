@@ -11,7 +11,7 @@ import scipy
 
 class LeastSquaresApproximator:
     def __init__(self, vectorX: list, vectorY: list, k_approx_order: int = 2, ftype: str = "auto", makeplot=False, customfunc=None, resolution=10,
-    print_matrix=False, customstep=None):
+    print_matrix=False, customstep=None, without_print=False):
         """ Calculates least squares for the choosen ftype. Set makeplot to true to construct the plt.plot for the splines
 
         customfunc: Can be specified to use instead of default autofunc
@@ -23,7 +23,8 @@ class LeastSquaresApproximator:
             vector_deltaF
         """
 
-        print("\nLeast Squares -------------\n")
+        if not without_print:
+            print("\nLeast Squares -------------\n")
         # Initialize class fields
         self.k_approx_order = k_approx_order
         self.resolution = resolution
@@ -43,7 +44,7 @@ class LeastSquaresApproximator:
             self.matrixA.tolist(), mh.unpack_vector(self.vectorB.tolist()))
 
         # Print the newly created power basis matrix if necessary
-        if print_matrix:
+        if not without_print and print_matrix:
             mh.full_print(
                 matrixAB=self.matrixAB,
                 vars=['x'+str(i) for i in range(0, self.n)],
@@ -54,10 +55,12 @@ class LeastSquaresApproximator:
             matrixAB=self.matrixAB,
             vars=['x'+str(i) for i in range(0, self.n)],
             matrix_name="",
-            print_only_results=True).solution_vectorX
+            print_only_results=True,
+            without_print=without_print).solution_vectorX
 
-        print("solution_vectorX (a coefficients) =", self.solution_vectorX)
-        print("vectorX[0] =",self.vectorX[0])
+        if not without_print:
+            print("solution_vectorX (a coefficients) =", self.solution_vectorX)
+            print("vectorX[0] =",self.vectorX[0])
 
         # Initializing vectorF and vector_deltaF as empty lists
         self.vectorF = []
@@ -66,9 +69,11 @@ class LeastSquaresApproximator:
         # Then we need to calculate the approximation vector from the solution vector
         # using the choosen type of approximation function (auto by default)
         if ftype == "linear_deprecated":
-            print("Using linear approximation basis function")
-            def linfunc(a, x): 
-                print("a * x + sum(solutions) = ", a, "*", x, "+",
+            if not without_print:
+                print("Using linear approximation basis function")
+            def linfunc(a, x):
+                if not without_print:
+                    print("a * x + sum(solutions) = ", a, "*", x, "+",
                 sum(self.solution_vectorX[:-1]), "=", a * x + sum(self.solution_vectorX[:-1]))
                 return a * x + sum(self.solution_vectorX[:-1])
             self.vectorF = [linfunc(self.solution_vectorX[-1], self.vectorX[i]) for i in range(0, self.n)]
@@ -78,21 +83,24 @@ class LeastSquaresApproximator:
             exit
 
         elif ftype == "custom":
-            print("Using custom approximation basis function")
+            if not without_print:
+                print("Using custom approximation basis function")
             self.vectorF = [customfunc(self.solution_vectorX, self.vectorX[i]) for i in range(0, self.n)]
             self.vector_deltaF = [(self.vectorY[i] - self.vectorF[i]) ** 2 for i in range(0, self.n)]
 
         elif ftype in ("auto", "", None):
-            print("Using auto (default) approximation basis function")
+            if not without_print:
+                print("Using auto (default) approximation basis function")
             self.vectorF = [self.autofunc(self.solution_vectorX, self.vectorX[i]) for i in range(0, self.n)]
             self.vector_deltaF = [(self.vectorY[i] - self.vectorF[i]) ** 2 for i in range(0, self.n)]
 
         else:
             raise ValueError("You need to choose ftype!")
 
-        print("Sum of vector_deltaF =", sum(self.vector_deltaF))
-        print("vectorF:\n", self.vectorF, "\nvector_deltaF:\n", self.vector_deltaF)
-        print("\n--------------------------- End Least Squares")
+        if not without_print:
+            print("Sum of vector_deltaF =", sum(self.vector_deltaF))
+            print("vectorF:\n", self.vectorF, "\nvector_deltaF:\n", self.vector_deltaF)
+            print("\n--------------------------- End Least Squares")
 
         # Getting interpolated vectors of X and Y to build smooth curve (count of points depends on the resolution parameter)
         self.interpolated_vectorX, self.interpolated_vectorY = self.get_interpolated_xy_vectors()

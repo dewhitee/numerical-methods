@@ -9,7 +9,7 @@ import matrix_helpers as mh
 
 class CubicSplineInterpolator:
 
-    def __init__(self, known_vectorX: list, known_vectorY: list, known_points: list=None, vars = []):
+    def __init__(self, known_vectorX: list, known_vectorY: list, known_points: list=None, vars = [], without_print=False):
         """ 
         known_points -- is the list of pairs of the points (nodes) that are known at the start
 
@@ -105,6 +105,7 @@ class CubicSplineInterpolator:
         self.known_points = known_points
         self.points_count = len(known_points if known_points is not None else known_vectorX)
         self.spline_count = self.points_count - 1
+        self.without_print = without_print
 
         # Get the X and Y vectors from the known_points, or use known_vectorX and known_vectorY if provided
         self.vectorX = known_vectorX if known_vectorX is not None else [elem[0] for elem in known_points]
@@ -137,7 +138,8 @@ class CubicSplineInterpolator:
             self.coefficientsB[i] = (self.deltaY[i]/self.vectorH[i]) - (self.vectorH[i]/3) * (2*self.coefficientsC[i] + self.coefficientsC[i+1])
 
         # Printing final table of coefficients
-        self.print_results_table()
+        if not without_print:
+            self.print_results_table()
 
         # def get_tridiagonal_matrix(a: list, b: list, c: list, k1=-1, k2=0, k3=1):
         #     return np.diag(a, k1) + np.diag(b, k2) + np.diag(c, k3)
@@ -216,8 +218,9 @@ class CubicSplineInterpolator:
         X = [0] * n
         X[n - 1] = betas[n - 1]
 
-        print("alphas=",alphas)
-        print("betas=",betas)
+        if not self.without_print:
+            print("alphas=",alphas)
+            print("betas=",betas)
 
         # Backward substitution
         for i in range(n - 2, -1, -1):
