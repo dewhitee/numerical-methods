@@ -27,11 +27,15 @@ class GaussElimination:
                 print_matrix()
 
         # Find the pivot element - we need to put it as the first row in the matrix
+        # This will impove calculation accuracy and make division by zero impossible
         for i in range(self.matrix_len):
+            # Iterating as columns starting from the i + 1 element, pushing larger rows up
             for k in range(i + 1, self.matrix_len):
+                # Checking if module of main diagonal element is less than module of k-element of i-th column
                 if abs(matrix_copy[i][i]) < abs(matrix_copy[k][i]):
+                    # Swapping each element of current i-th row with each element of larger k-th row
                     for j in range(0, self.matrix_len + 1):
-                        # Swapping elements
+                        # Swapping elements (current row element with larger k-th row element)
                         matrix_copy[i][j], matrix_copy[k][j] = matrix_copy[k][j], matrix_copy[i][j]
 
         if not without_print and not print_only_results:
@@ -40,12 +44,15 @@ class GaussElimination:
 
         # Main Gauss Elimination loop
         # Forward elimination -- Straight step (Nulling the bottom-left corner)
+        # Making Upper-Triangle (TU) matrix from the initial matrix
         for i in range(self.matrix_len - 1):
+            # Iterating as columns
             for k in range(i + 1, self.matrix_len):
+                # Dividing k-th row i-th element by the current main diagonal element
                 coefficient = matrix_copy[k][i] / matrix_copy[i][i] # Coefficient
         
-                # Make the elements below the pivot elements equal to zero 
-                # or eliminate the variables
+                # Make the elements below the pivot elements equal to zero or eliminate the variables
+                # Iterating all elements of rows (including the vectorB)
                 for j in range(0, self.matrix_len + 1):
                     matrix_copy[k][j] -= coefficient * matrix_copy[i][j]
 
@@ -57,19 +64,19 @@ class GaussElimination:
         # Initializing all variables values with zero
         vars_values = [0] * self.matrix_len
 
-        # Back substitution -- Reversed step (Nulling upper-right corner)
+        # Back substitution -- Reversed step
+        # Finding the solution_vectorX values
         for i in range(self.matrix_len - 1, -1, -1):
-            # Make the variable to be calculated equal to the vectorB[i] from the last equation
+            # Make the variable (Xi) to be calculated equal to the vectorB[i] from the last equation
             vars_values[i] = matrix_copy[i][self.matrix_len]
 
             for j in range(i + 1, self.matrix_len):
-                # Subtracting all values of matrixA except the coefficient of the variable 
-                # (main diagonal i-th value value) whose value is being calculated
+                # Subtracting all values of matrixA except the main diagonal i-th value
+                # whose value is being calculated
                 if j != i:
                     vars_values[i] -= matrix_copy[i][j] * vars_values[j]
 
-            # Finally, divide the rhs by the coefficient of the variable
-            # (main diagonal i-th value) to be calculated
+            # Dividing the Xi by the main diagonal i-th value
             vars_values[i] /= matrix_copy[i][i]
 
         if not without_print and print_results:

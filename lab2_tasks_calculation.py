@@ -6,15 +6,15 @@ import numpy as np
 
 # 1 task
 least_squares_approx_result_0_0 = ls.LeastSquaresApproximator(
-    vectorX=[-2.2 + delta for delta in np.arange(0, 4, 0.5)],
-    vectorY=[0] * 8,
+    vectorX=[-2.2 + delta for delta in np.arange(0, 5, 0.5)],
+    vectorY=[0] * 10,
     ftype="custom",
     customfunc=lambda solvec, x: math.sin(5 * x) * math.exp(x),
     customstep=None,
     makeplot=False,
     k_approx_order=2,
     print_matrix=True,
-    resolution=5
+    resolution=10
 )
 
 least_squares_approx_result_0_1 = ls.LeastSquaresApproximator(
@@ -23,10 +23,22 @@ least_squares_approx_result_0_1 = ls.LeastSquaresApproximator(
     ftype="custom",
     customfunc=lambda solvec, x: math.sin(5 * x) * math.exp(x),
     customstep=None,
-    makeplot=True,
-    k_approx_order=4,
+    makeplot=False,
+    k_approx_order=3,
     print_matrix=True,
-    resolution=5
+    resolution=10
+)
+
+least_squares_approx_result_0_2 = ls.LeastSquaresApproximator(
+    vectorX=[-2.2 + delta for delta in np.arange(0, 5, 0.5)],
+    vectorY=[0] * 10,
+    ftype="custom",
+    customfunc=lambda solvec, x: math.sin(5 * x) * math.exp(x),
+    customstep=None,
+    makeplot=False,
+    k_approx_order=5,
+    print_matrix=True,
+    resolution=10
 )
 
 #from scipy.optimize import brentq
@@ -48,15 +60,11 @@ plt.title("Comparison of Least Squares")
 plt.plot(
     least_squares_approx_result_0_0.interpolated_vectorX,
     least_squares_approx_result_0_0.interpolated_vectorY,
-    "go-",
-    least_squares_approx_result_0_1.interpolated_vectorX,
-    least_squares_approx_result_0_1.interpolated_vectorY,
-    "y--",
+    "y--"
     )
 plt.legend(
     [
-        "Least Squares with 5 points",
-        "Least Squares with 10 points",
+        "Least Squares with approximation order k = 2",
         "Known points"
     ]
 )
@@ -105,6 +113,33 @@ least_squares_approx_result_3 = ls.LeastSquaresApproximator(
 )
 
 # Compare cubic spline interpolation with least squares graphically
+
+plt.figure("Least Squares approximation with different k values")
+plt.title("Least Squares approximation with different k values")
+plt.plot(
+    least_squares_approx_result_1.interpolated_vectorX,
+    least_squares_approx_result_1.interpolated_vectorY,
+    "c--",
+    least_squares_approx_result_2.interpolated_vectorX,
+    least_squares_approx_result_2.interpolated_vectorY,
+    "r--",
+    least_squares_approx_result_3.interpolated_vectorX,
+    least_squares_approx_result_3.interpolated_vectorY,
+    "y--",
+    known_vectorX,
+    known_vectorY,
+    "bo")
+plt.legend(
+    [
+        "Least Squares with approximation order k = 2",
+        "Least Squares with approximation order k = 3",
+        "Least Squares with approximation order k = 5",
+        "Known points"
+    ]
+)
+plt.xlabel("X values")
+plt.ylabel("Y values")
+plt.show()
 
 plt.figure("Comparison of Cubic-spline interpolation with Least Squares")
 plt.title("Comparison of Cubic-spline interpolation with Least Squares")

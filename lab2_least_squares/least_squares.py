@@ -195,7 +195,7 @@ class LeastSquaresApproximator:
         plt.figure("Least Squares by dewhitee")
         plt.title("Least Squares approximation with k = " + str(self.k_approx_order))
         plt.plot(self.vectorX, self.vectorY, 'bs', self.vectorX, self.vectorF, 'g--', self.vectorX, self.vectorF, 'g^')
-        plt.plot(self.interpolated_vectorX, self.interpolated_vectorY, 'yo-')
+        plt.plot(self.interpolated_vectorX, self.interpolated_vectorY, 'y--')
         plt.xlabel("X values")
         plt.ylabel("Y values")
         for i in range(0, len(self.vectorX) - 1):

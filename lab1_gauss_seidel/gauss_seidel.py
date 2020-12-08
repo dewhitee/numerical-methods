@@ -32,11 +32,6 @@ class GaussSeidel:
 
         returns list of solution variables X
         """
-
-        # Reading tolerable error (required accuracy)
-        #e = float(input('Enter tolerable error: '))
-
-        # Implementation of Gauss Seidel Iteration
         if not without_print:
             print('\n-------------------------------------Gauss Seidel - ' + matrix_name)
             print('Using equations list...') if matrixAB is None else print ('Using matrix...')
@@ -55,7 +50,7 @@ class GaussSeidel:
 
         iteration = 1
 
-        # Adjust matrix
+        # Adjusting matrix (swapping rows if necessary to put all largest elements on main diagonal)
         adjusted_matrixAB = None
         if auto_adjust_matrix:
             adjusted_matrixAB = self.adjust_matrix(matrixAB)
@@ -64,10 +59,11 @@ class GaussSeidel:
         else:
             adjusted_matrixAB = matrixAB
 
+        # Main loop
         while condition:
             e_list = []
 
-            # Calculating all variables
+            # Calculating all variables on the current iteration
             if adjusted_matrixAB is None:
                 self.iterate_equations(equations, e_list, vars_values)
             else:

@@ -154,6 +154,7 @@ class CubicSplineInterpolator:
         out_vectorX = list()
         out_vectorY = list()
 
+        # Filling up the out_vectors with interpolated values got with each current_x
         for i in range(0, self.spline_count):
             current_step = self.vectorH[i] / resolution
             current_x = self.vectorX[i]
@@ -187,7 +188,6 @@ class CubicSplineInterpolator:
         i = spline_index
         previous_x = self.vectorX[spline_index]
         h = x - previous_x
-        #print("h = ", h)
         return self.coefficientsA[i] + self.coefficientsB[i][0] * h + self.coefficientsC[i] * (h ** 2) + self.coefficientsD[i][0] * (h ** 3)
 
     def solve_tridiagonal_matrix(self, matrixA, vectorB, vars) -> list:
@@ -203,7 +203,7 @@ class CubicSplineInterpolator:
         alphas = [0] * n
         betas = [0] * n
 
-        # Initializing a1 and b1
+        # Initializing a1 and b1, where alpha1 = a12 / a11, and beta1 = b1 / a11
         alphas[0] = matrixA[0, 1] / matrixA[0, 0]
         betas[0] = vectorB[0][0] / matrixA[0, 0]
 
@@ -212,7 +212,7 @@ class CubicSplineInterpolator:
             alphas[i] = matrixA[i, i + 1] / (matrixA[i, i] - matrixA[i, i-1] * alphas[i-1])
             betas[i] = (vectorB[i][0] - matrixA[i, i-1] * betas[i-1]) / (matrixA[i, i] - matrixA[i, i-1] * alphas[i - 1])
         
-        # Initialize vector of out X results, where x_n = beta_n
+        # Initialize vector of out X results with zeros, where x_n = beta_n
         X = [0] * n
         X[n - 1] = betas[n - 1]
 
@@ -265,12 +265,13 @@ class CubicSplineInterpolator:
         matrixA[-1, -1] = 1
 
         # See https://e.tsi.lv/pluginfile.php/130692/mod_resource/content/2/%D0%A7%D0%B8%D1%81%D0%BB%D0%B5%D0%BD%D0%BD%D1%8B%D0%B5%20%D0%BC%D0%B5%D1%82%D0%BE%D0%B4%D1%8B_LECTURES-2017.pdf
+        # Set values to three diagonals
         for i in range(1, self.points_count - 1):
             matrixA[i, i-1] = self.vectorH[i-1]                   # Set lower-diagonal element
             matrixA[i, i+1] = self.vectorH[i]                     # Set upper-diagonal element
             matrixA[i, i] = 2*(self.vectorH[i-1]+self.vectorH[i]) # Set main-diagonal element
 
-            # Get vector B (C coefficients)
+            # Get vector B (C coefficients, in our case)
             vectorB[i, 0] = 3*(self.deltaY[i]/self.vectorH[i] - self.deltaY[i-1]/self.vectorH[i-1])
 
         return matrixA, vectorB
