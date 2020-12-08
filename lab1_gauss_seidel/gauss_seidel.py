@@ -59,7 +59,8 @@ class GaussSeidel:
         adjusted_matrixAB = None
         if auto_adjust_matrix:
             adjusted_matrixAB = self.adjust_matrix(matrixAB)
-            print("(Auto adjustment of matrix is enabled)\nAdjusted matrix:\n", adjusted_matrixAB)
+            if not without_print:
+                print("(Auto adjustment of matrix is enabled)\nAdjusted matrix:\n", adjusted_matrixAB)
         else:
             adjusted_matrixAB = matrixAB
 

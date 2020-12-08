@@ -42,11 +42,74 @@ matrix_2_updated = [
     [-3, -3, 5, -5, 8]
 ]
 
+def timer_elimination():
+    ge.GaussElimination(
+        matrixAB=matrix_2,
+        vars=['x1', 'x2', 'x3', 'x4'],
+        print_only_results=True,
+        matrix_name="Second matrix (Elimination)",
+        print_results=False,
+        without_print=True
+    )
+
+def timer_seidel():
+    gs.GaussSeidel(
+        matrixAB=matrix_2,
+        equations=None,
+        vars=['x1', 'x2', 'x3', 'x4'],
+        e=0.00001,
+        print_only_results=True,
+        matrix_name="Second matrix (Seidel)",
+        max_iterations=1000,
+        show_errors_list=False,
+        auto_adjust_matrix=True,
+        without_print=True
+    )
+
+def timer_seidel2():
+    gs.GaussSeidel(
+        matrixAB=matrix_2_updated,
+        equations=None,
+        vars=['x1', 'x2', 'x3', 'x4'],
+        e=0.00001,
+        print_only_results=True,
+        matrix_name="Second matrix (Seidel)",
+        max_iterations=1000,
+        show_errors_list=False,
+        auto_adjust_matrix=False,
+        without_print=True
+    )
+
+def timer_seidel3():
+    gs.GaussSeidel(
+        matrixAB=matrix_2_updated,
+        equations=None,
+        vars=['x1', 'x2', 'x3', 'x4'],
+        e=0.0001,
+        print_only_results=True,
+        matrix_name="Second matrix (Seidel)",
+        max_iterations=1000,
+        show_errors_list=False,
+        auto_adjust_matrix=False,
+        without_print=True
+    )
+
+print("Gauss Elimination - time elapsed\n(number of calls = 10000):\n", timeit.timeit("timer_elimination()", 
+    setup="from __main__ import timer_elimination", number=10000), 'seconds \n')
+print("Gauss Seidel with auto-adjustment of matrix and e = 0.00001 - time elapsed\n (number of calls = 10000):\n", timeit.timeit('timer_seidel()',
+    setup="from __main__ import timer_seidel", number=10000), 'seconds\n')
+print("Gauss Seidel without auto-adjustment of matrix and e = 0.00001 - time elapsed\n (number of calls = 10000):\n", timeit.timeit('timer_seidel2()',
+    setup="from __main__ import timer_seidel2", number=10000), 'seconds\n')
+print("Gauss Seidel without auto-adjustment of matrix and e = 0.0001 - time elapsed\n (number of calls = 10000):\n", timeit.timeit('timer_seidel3()',
+    setup="from __main__ import timer_seidel3", number=10000), 'seconds\n')
+
+
 ge.GaussElimination(
     matrixAB=matrix_2,
     vars=['x1', 'x2', 'x3', 'x4'],
     print_only_results=True,
-    matrix_name="Second matrix (Elimination)"
+    matrix_name="Second matrix (Elimination)",
+    without_print=False
 )
 
 gs.GaussSeidel(
