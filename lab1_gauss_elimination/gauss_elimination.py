@@ -81,7 +81,6 @@ class GaussElimination:
         self.vars_values = vars_values
         self.matrix_copy = matrix_copy
         self.solution_vectorX = vars_values
-        #return vars_values
 
 test_matrix = [
     [25, 5, 1, 106.8],

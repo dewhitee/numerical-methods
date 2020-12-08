@@ -7,6 +7,7 @@ import numpy as np
 import matrix_helpers as mh
 import lab1_gauss_elimination.gauss_elimination as ge
 import roots
+import scipy
 
 class LeastSquaresApproximator:
     def __init__(self, vectorX: list, vectorY: list, k_approx_order: int = 2, ftype: str = "auto", makeplot=False, customfunc=None, resolution=10,
@@ -100,15 +101,12 @@ class LeastSquaresApproximator:
         if makeplot:
             self.make_plot()
 
-        #return vectorF, vector_deltaF
-
     def autofunc(self, solvec, x):
         return sum([solvec[i] * (x ** i) for i in range(0, len(solvec))])
 
     def get_x_from_y_estimated(self, y, lower_border = -0.5, upper_border = 0.5, max_iterations=500, tolerance=0.0001):
         """ Finds the estimated x by the Bisection Method
         """
-
         return roots.RootFinder(
             self.autofunc if self.customfunc is None else self.customfunc,
             solution_vectorX=self.solution_vectorX
@@ -119,26 +117,44 @@ class LeastSquaresApproximator:
             tolerance=tolerance
         )
 
-    def get_x_from_y_closest(self, y):
-        # Get the closest known x from the interpolated_vectorX and the corresponding Y from the interpolated_vectorY
+    def get_x_from_y_closest(self, y, vectorX=None, vectorY=None):
+        """ Returns the closest_x value with the index
+        """
+        # Get the closest known x from the vectorX and the corresponding y from the vectorY
         closest_list = []
-        for v in self.interpolated_vectorY:
+        for v in self.interpolated_vectorY if vectorY is None else vectorY:
             closest_list.append(abs(y - v))
-        closest_x = self.interpolated_vectorX[closest_list.index(min(closest_list))]
-        print("Closest x was:", closest_x)
-        return closest_x
+        closest_y_index = closest_list.index(min(closest_list))
+        closest_x = self.interpolated_vectorX[closest_y_index] if vectorX is None else vectorX[closest_y_index]
+        return closest_x, closest_y_index
 
-    def get_x_from_y_interpolated(self, y):
-        # Get the closest known x from the interpolated_vectorX and the corresponding Y from the interpolated_vectorY
-        closest_y = min(self.interpolated_vectorY, key=lambda val: abs(y - val))
-        print("Closest y was:", closest_y)
-        closest_x = self.interpolated_vectorX[self.interpolated_vectorY.index(closest_y)]
-        print("Closest x was:", closest_x)
-        if self.customfunc is None:
-            exit
-        else:
-            exit
-        return self.interpolated_vectorX(self.vectorF.index(y))
+    def get_closest_boundary_points(self, y):
+        closest_x = self.get_x_from_y_closest(y)
+        index = 0
+        for i in range(0, len(self.vectorX)):
+            if self.vectorX[i] > closest_x[0]:
+                index = i
+                break
+        return self.vectorX[index - 1], self.vectorF[index - 1], self.vectorX[index], self.vectorF[index]
+
+    def get_x_from_y_interpolated(self, y, resolution = 100):
+        # Get the closest known x from the reinterpolated vector X and the corresponding y from the reinterpolated vector Y
+        xvec, yvec = self.get_interpolated_xy_vectors(resolution)
+        new_closest = self.get_x_from_y_closest(y, xvec, yvec)
+        return xvec[new_closest[1]]
+    
+    def interpolate(self, currentX, deltaX, resolution):
+        interpolated_vectorX = list()
+        interpolated_vectorY = list()
+
+        step = deltaX / resolution
+        for i in range(0, resolution):
+            new_y = self.autofunc(self.solution_vectorX, currentX) if self.customfunc is None else self.customfunc(self.solution_vectorX, currentX)
+            interpolated_vectorY.append(new_y)
+            interpolated_vectorX.append(currentX)
+            currentX += step
+
+        return interpolated_vectorX, interpolated_vectorY
 
     def get_y_from_x(self, x):
         if self.customfunc is None:
@@ -146,19 +162,21 @@ class LeastSquaresApproximator:
         else:
             return self.customfunc(self.solution_vectorX, x)
 
-    def get_interpolated_xy_vectors(self):
+    def get_interpolated_xy_vectors(self, custom_resolution=None):
         """ Creates the interpolated lists of X and Y with points count specified by resolution parameter.
         """
         # Initializing empty out vectors
         out_vectorX = list()
         out_vectorY = list()
 
+        resolution = self.resolution if custom_resolution is None else custom_resolution
+
         # Getting values interpolated between x[i] and x[i+1] points
         for i in range(0, len(self.vectorX) - 1):
-            current_step = (self.vectorX[i + 1] - self.vectorX[i]) / self.resolution if self.customstep is None else self.customstep
+            current_step = (self.vectorX[i + 1] - self.vectorX[i]) / resolution if self.customstep is None else self.customstep
             current_x = self.vectorX[i]
             # Adding each point to the out vector
-            for j in range(0, self.resolution):
+            for j in range(0, resolution):
                 # Calculating interpolated Y point and adding it to the out Y vector
                 out_vectorY.append(self.autofunc(self.solution_vectorX, current_x) 
                     if self.customfunc is None else self.customfunc(self.solution_vectorX, current_x))
@@ -176,26 +194,8 @@ class LeastSquaresApproximator:
     def make_plot(self):
         plt.figure("Least Squares by dewhitee")
         plt.title("Least Squares approximation with k = " + str(self.k_approx_order))
-
-        # initial_x = 1.337572
-        # y_from_x_0 = self.get_y_from_x(initial_x)
-        # initial_y_4 = 1.4
-        # x_from_y_4 = self.get_x_from_y_closest(initial_y_4)
-        # initial_y_5 = 1.5
-        # x_from_y_5 = self.get_x_from_y_closest(initial_y_5)
-        # initial_y_6 = 1.6
-        # x_from_y_6 = self.get_x_from_y_closest(initial_y_6)
-        # plt.plot(
-        #     initial_x,
-        #     y_from_x_0,
-        #     "ro",
-        #     [x_from_y_4, x_from_y_5, x_from_y_6],
-        #     [initial_y_4, initial_y_5, initial_y_6],
-        #     "ko"
-        # )
-
         plt.plot(self.vectorX, self.vectorY, 'bs', self.vectorX, self.vectorF, 'g--', self.vectorX, self.vectorF, 'g^')
-        plt.plot(self.interpolated_vectorX, self.interpolated_vectorY, 'y--')
+        plt.plot(self.interpolated_vectorX, self.interpolated_vectorY, 'yo-')
         plt.xlabel("X values")
         plt.ylabel("Y values")
         for i in range(0, len(self.vectorX) - 1):

@@ -29,3 +29,5 @@ class RootFinder:
         #    out_x = upper_approx_x - (self.function())
 
     #def brent(self, )
+
+    #def custom(self, x, y)

@@ -11,10 +11,10 @@ least_squares_approx_result_0_0 = ls.LeastSquaresApproximator(
     ftype="custom",
     customfunc=lambda solvec, x: math.sin(5 * x) * math.exp(x),
     customstep=None,
-    makeplot=True,
+    makeplot=False,
     k_approx_order=2,
     print_matrix=True,
-    resolution=10
+    resolution=5
 )
 
 least_squares_approx_result_0_1 = ls.LeastSquaresApproximator(
@@ -26,7 +26,7 @@ least_squares_approx_result_0_1 = ls.LeastSquaresApproximator(
     makeplot=True,
     k_approx_order=4,
     print_matrix=True,
-    resolution=20
+    resolution=5
 )
 
 #from scipy.optimize import brentq
