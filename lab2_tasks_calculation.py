@@ -6,15 +6,15 @@ import numpy as np
 
 # 1 task
 least_squares_approx_result_0_0 = ls.LeastSquaresApproximator(
-    vectorX=[-2.2 + delta for delta in np.arange(0, 2.5, 0.5)],
-    vectorY=[0] * 5,
+    vectorX=[-2.2 + delta for delta in np.arange(0, 4, 0.5)],
+    vectorY=[0] * 8,
     ftype="custom",
     customfunc=lambda solvec, x: math.sin(5 * x) * math.exp(x),
     customstep=None,
-    makeplot=False,
+    makeplot=True,
     k_approx_order=2,
     print_matrix=True,
-    resolution=5
+    resolution=10
 )
 
 least_squares_approx_result_0_1 = ls.LeastSquaresApproximator(
@@ -23,11 +23,25 @@ least_squares_approx_result_0_1 = ls.LeastSquaresApproximator(
     ftype="custom",
     customfunc=lambda solvec, x: math.sin(5 * x) * math.exp(x),
     customstep=None,
-    makeplot=False,
+    makeplot=True,
     k_approx_order=4,
     print_matrix=True,
-    resolution=10
+    resolution=20
 )
+
+#from scipy.optimize import brentq
+#print("Root of Y = 1.5 is ", brentq(lambda x: math.sin(5 * x) * math.exp(x), 0, 10))
+
+#from scipy.optimize import root
+#print("Root of Y = 1.5 is ", root(lambda x: math.sin(5 * x) * math.exp(x), 0.5).x[0])
+
+# initial_x = 1.337572
+# y_from_x_0 = least_squares_approx_result_0_0.get_y_from_x(initial_x)
+# initial_y = 1.7
+# x_from_y_1 = least_squares_approx_result_0_0.get_x_from_y(initial_y, -0.0001, +0.0001, 10000, 0.000001)
+# print("Y of X=", initial_x,":", y_from_x_0)
+# print("X of Y=",initial_y,":", x_from_y_1)
+#print("Y of X=", x_from_y_0, ":", y_from_x_1)
 
 plt.figure("Comparison Least Squares")
 plt.title("Comparison of Least Squares")
@@ -86,7 +100,8 @@ least_squares_approx_result_3 = ls.LeastSquaresApproximator(
     vectorY=known_vectorY,
     k_approx_order=5,
     makeplot=False,
-    resolution=30
+    resolution=30,
+    print_matrix=True
 )
 
 # Compare cubic spline interpolation with least squares graphically

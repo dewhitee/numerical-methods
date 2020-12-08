@@ -29,7 +29,7 @@ least_squares_approx_result = ls.LeastSquaresApproximator(
     vectorY=known_vectorY,
     k_approx_order=1,
     makeplot=True,
-    ftype="linear"
+    ftype="linear_deprecated"
 )
 
 known_vectorX_2 = [0, 3.3, 6.6, 9.9]

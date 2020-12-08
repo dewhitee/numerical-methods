@@ -59,18 +59,17 @@ class GaussElimination:
 
         # Back substitution -- Reversed step (Nulling upper-right corner)
         for i in range(self.matrix_len - 1, -1, -1):
-            # Make the variable to be calculated equal to the rhs of the
-            # last equation
+            # Make the variable to be calculated equal to the vectorB[i] from the last equation
             vars_values[i] = matrix_copy[i][self.matrix_len]
 
             for j in range(i + 1, self.matrix_len):
-                # Subtracting all the lhs values except the coefficient 
-                # of the variable whose value is being calculated
+                # Subtracting all values of matrixA except the coefficient of the variable 
+                # (main diagonal i-th value value) whose value is being calculated
                 if j != i:
                     vars_values[i] -= matrix_copy[i][j] * vars_values[j]
 
             # Finally, divide the rhs by the coefficient of the variable
-            # to be calculated
+            # (main diagonal i-th value) to be calculated
             vars_values[i] /= matrix_copy[i][i]
 
         if not without_print and print_results:

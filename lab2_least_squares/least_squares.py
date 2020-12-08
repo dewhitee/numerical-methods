@@ -6,6 +6,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import numpy as np
 import matrix_helpers as mh
 import lab1_gauss_elimination.gauss_elimination as ge
+import roots
 
 class LeastSquaresApproximator:
     def __init__(self, vectorX: list, vectorY: list, k_approx_order: int = 2, ftype: str = "auto", makeplot=False, customfunc=None, resolution=10,
@@ -36,18 +37,16 @@ class LeastSquaresApproximator:
         # Getting matrix and b coefficients vector from the power basis
         self.matrixA, self.vectorB = self.get_power_basis_matrix()
 
-        # Print the newly created power basis matrix if necessary
-        if print_matrix:
-            mh.full_print(
-                mh.append_vectorB_to_matrixA(
-                    matrixA=self.matrixA.tolist(), 
-                    vectorB=mh.unpack_vector(self.vectorB.tolist())),
-                    vars=['x'+str(i) for i in range(0, self.n)], 
-                    title="Power basis matrix with k = " + str(k_approx_order))
-
         # Making the one whole matrix from the matrixA and vectorB to pass into the Gauss Elimination solving function
         self.matrixAB = mh.append_vectorB_to_matrixA(
             self.matrixA.tolist(), mh.unpack_vector(self.vectorB.tolist()))
+
+        # Print the newly created power basis matrix if necessary
+        if print_matrix:
+            mh.full_print(
+                matrixAB=self.matrixAB,
+                vars=['x'+str(i) for i in range(0, self.n)],
+                title="Power basis matrix with k = " + str(k_approx_order))
 
         # Solving matrix with Gauss Elimination, getting the X vector of solutions for power basis matrix
         self.solution_vectorX = ge.GaussElimination(
@@ -56,8 +55,8 @@ class LeastSquaresApproximator:
             matrix_name="",
             print_only_results=True).solution_vectorX
 
-        print("solution_vectorX = ", self.solution_vectorX)
-        print("vectorX[0]=",self.vectorX[0])
+        print("solution_vectorX (a coefficients) =", self.solution_vectorX)
+        print("vectorX[0] =",self.vectorX[0])
 
         # Initializing vectorF and vector_deltaF as empty lists
         self.vectorF = []
@@ -65,7 +64,7 @@ class LeastSquaresApproximator:
 
         # Then we need to calculate the approximation vector from the solution vector
         # using the choosen type of approximation function (auto by default)
-        if ftype == "linear":
+        if ftype == "linear_deprecated":
             print("Using linear approximation basis function")
             def linfunc(a, x): 
                 print("a * x + sum(solutions) = ", a, "*", x, "+",
@@ -82,10 +81,13 @@ class LeastSquaresApproximator:
             self.vectorF = [customfunc(self.solution_vectorX, self.vectorX[i]) for i in range(0, self.n)]
             self.vector_deltaF = [(self.vectorY[i] - self.vectorF[i]) ** 2 for i in range(0, self.n)]
 
-        elif ftype == "auto":
+        elif ftype in ("auto", "", None):
             print("Using auto (default) approximation basis function")
             self.vectorF = [self.autofunc(self.solution_vectorX, self.vectorX[i]) for i in range(0, self.n)]
             self.vector_deltaF = [(self.vectorY[i] - self.vectorF[i]) ** 2 for i in range(0, self.n)]
+
+        else:
+            raise ValueError("You need to choose ftype!")
 
         print("Sum of vector_deltaF =", sum(self.vector_deltaF))
         print("vectorF:\n", self.vectorF, "\nvector_deltaF:\n", self.vector_deltaF)
@@ -102,6 +104,47 @@ class LeastSquaresApproximator:
 
     def autofunc(self, solvec, x):
         return sum([solvec[i] * (x ** i) for i in range(0, len(solvec))])
+
+    def get_x_from_y_estimated(self, y, lower_border = -0.5, upper_border = 0.5, max_iterations=500, tolerance=0.0001):
+        """ Finds the estimated x by the Bisection Method
+        """
+
+        return roots.RootFinder(
+            self.autofunc if self.customfunc is None else self.customfunc,
+            solution_vectorX=self.solution_vectorX
+        ).bisection(
+            lower=y + lower_border,
+            upper=y + upper_border,
+            max_iterations=max_iterations,
+            tolerance=tolerance
+        )
+
+    def get_x_from_y_closest(self, y):
+        # Get the closest known x from the interpolated_vectorX and the corresponding Y from the interpolated_vectorY
+        closest_list = []
+        for v in self.interpolated_vectorY:
+            closest_list.append(abs(y - v))
+        closest_x = self.interpolated_vectorX[closest_list.index(min(closest_list))]
+        print("Closest x was:", closest_x)
+        return closest_x
+
+    def get_x_from_y_interpolated(self, y):
+        # Get the closest known x from the interpolated_vectorX and the corresponding Y from the interpolated_vectorY
+        closest_y = min(self.interpolated_vectorY, key=lambda val: abs(y - val))
+        print("Closest y was:", closest_y)
+        closest_x = self.interpolated_vectorX[self.interpolated_vectorY.index(closest_y)]
+        print("Closest x was:", closest_x)
+        if self.customfunc is None:
+            exit
+        else:
+            exit
+        return self.interpolated_vectorX(self.vectorF.index(y))
+
+    def get_y_from_x(self, x):
+        if self.customfunc is None:
+            return self.autofunc(self.solution_vectorX, x)
+        else:
+            return self.customfunc(self.solution_vectorX, x)
 
     def get_interpolated_xy_vectors(self):
         """ Creates the interpolated lists of X and Y with points count specified by resolution parameter.
@@ -133,8 +176,26 @@ class LeastSquaresApproximator:
     def make_plot(self):
         plt.figure("Least Squares by dewhitee")
         plt.title("Least Squares approximation with k = " + str(self.k_approx_order))
+
+        # initial_x = 1.337572
+        # y_from_x_0 = self.get_y_from_x(initial_x)
+        # initial_y_4 = 1.4
+        # x_from_y_4 = self.get_x_from_y_closest(initial_y_4)
+        # initial_y_5 = 1.5
+        # x_from_y_5 = self.get_x_from_y_closest(initial_y_5)
+        # initial_y_6 = 1.6
+        # x_from_y_6 = self.get_x_from_y_closest(initial_y_6)
+        # plt.plot(
+        #     initial_x,
+        #     y_from_x_0,
+        #     "ro",
+        #     [x_from_y_4, x_from_y_5, x_from_y_6],
+        #     [initial_y_4, initial_y_5, initial_y_6],
+        #     "ko"
+        # )
+
         plt.plot(self.vectorX, self.vectorY, 'bs', self.vectorX, self.vectorF, 'g--', self.vectorX, self.vectorF, 'g^')
-        plt.plot(self.interpolated_vectorX, self.interpolated_vectorY, 'y-')
+        plt.plot(self.interpolated_vectorX, self.interpolated_vectorY, 'y--')
         plt.xlabel("X values")
         plt.ylabel("Y values")
         for i in range(0, len(self.vectorX) - 1):
