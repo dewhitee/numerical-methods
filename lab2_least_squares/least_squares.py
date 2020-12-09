@@ -6,10 +6,12 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import numpy as np
 import matrix_helpers as mh
 import lab1_gauss_elimination.gauss_elimination as ge
+import roots
+import scipy
 
 class LeastSquaresApproximator:
     def __init__(self, vectorX: list, vectorY: list, k_approx_order: int = 2, ftype: str = "auto", makeplot=False, customfunc=None, resolution=10,
-    print_matrix=False, customstep=None):
+    print_matrix=False, customstep=None, without_print=False):
         """ Calculates least squares for the choosen ftype. Set makeplot to true to construct the plt.plot for the splines
 
         customfunc: Can be specified to use instead of default autofunc
@@ -21,7 +23,8 @@ class LeastSquaresApproximator:
             vector_deltaF
         """
 
-        print("\nLeast Squares -------------\n")
+        if not without_print:
+            print("\nLeast Squares -------------\n")
         # Initialize class fields
         self.k_approx_order = k_approx_order
         self.resolution = resolution
@@ -36,28 +39,28 @@ class LeastSquaresApproximator:
         # Getting matrix and b coefficients vector from the power basis
         self.matrixA, self.vectorB = self.get_power_basis_matrix()
 
-        # Print the newly created power basis matrix if necessary
-        if print_matrix:
-            mh.full_print(
-                mh.append_vectorB_to_matrixA(
-                    matrixA=self.matrixA.tolist(), 
-                    vectorB=mh.unpack_vector(self.vectorB.tolist())),
-                    vars=['x'+str(i) for i in range(0, self.n)], 
-                    title="Power basis matrix with k = " + str(k_approx_order))
-
         # Making the one whole matrix from the matrixA and vectorB to pass into the Gauss Elimination solving function
         self.matrixAB = mh.append_vectorB_to_matrixA(
             self.matrixA.tolist(), mh.unpack_vector(self.vectorB.tolist()))
+
+        # Print the newly created power basis matrix if necessary
+        if not without_print and print_matrix:
+            mh.full_print(
+                matrixAB=self.matrixAB,
+                vars=['x'+str(i) for i in range(0, self.n)],
+                title="Power basis matrix with k = " + str(k_approx_order))
 
         # Solving matrix with Gauss Elimination, getting the X vector of solutions for power basis matrix
         self.solution_vectorX = ge.GaussElimination(
             matrixAB=self.matrixAB,
             vars=['x'+str(i) for i in range(0, self.n)],
             matrix_name="",
-            print_only_results=True).solution_vectorX
+            print_only_results=True,
+            without_print=without_print).solution_vectorX
 
-        print("solution_vectorX = ", self.solution_vectorX)
-        print("vectorX[0]=",self.vectorX[0])
+        if not without_print:
+            print("solution_vectorX (a coefficients) =", self.solution_vectorX)
+            print("vectorX[0] =",self.vectorX[0])
 
         # Initializing vectorF and vector_deltaF as empty lists
         self.vectorF = []
@@ -65,10 +68,12 @@ class LeastSquaresApproximator:
 
         # Then we need to calculate the approximation vector from the solution vector
         # using the choosen type of approximation function (auto by default)
-        if ftype == "linear":
-            print("Using linear approximation basis function")
-            def linfunc(a, x): 
-                print("a * x + sum(solutions) = ", a, "*", x, "+",
+        if ftype == "linear_deprecated":
+            if not without_print:
+                print("Using linear approximation basis function")
+            def linfunc(a, x):
+                if not without_print:
+                    print("a * x + sum(solutions) = ", a, "*", x, "+",
                 sum(self.solution_vectorX[:-1]), "=", a * x + sum(self.solution_vectorX[:-1]))
                 return a * x + sum(self.solution_vectorX[:-1])
             self.vectorF = [linfunc(self.solution_vectorX[-1], self.vectorX[i]) for i in range(0, self.n)]
@@ -78,18 +83,24 @@ class LeastSquaresApproximator:
             exit
 
         elif ftype == "custom":
-            print("Using custom approximation basis function")
+            if not without_print:
+                print("Using custom approximation basis function")
             self.vectorF = [customfunc(self.solution_vectorX, self.vectorX[i]) for i in range(0, self.n)]
             self.vector_deltaF = [(self.vectorY[i] - self.vectorF[i]) ** 2 for i in range(0, self.n)]
 
-        elif ftype == "auto":
-            print("Using auto (default) approximation basis function")
+        elif ftype in ("auto", "", None):
+            if not without_print:
+                print("Using auto (default) approximation basis function")
             self.vectorF = [self.autofunc(self.solution_vectorX, self.vectorX[i]) for i in range(0, self.n)]
             self.vector_deltaF = [(self.vectorY[i] - self.vectorF[i]) ** 2 for i in range(0, self.n)]
 
-        print("Sum of vector_deltaF =", sum(self.vector_deltaF))
-        print("vectorF:\n", self.vectorF, "\nvector_deltaF:\n", self.vector_deltaF)
-        print("\n--------------------------- End Least Squares")
+        else:
+            raise ValueError("You need to choose ftype!")
+
+        if not without_print:
+            print("Sum of vector_deltaF =", sum(self.vector_deltaF))
+            print("vectorF:\n", self.vectorF, "\nvector_deltaF:\n", self.vector_deltaF)
+            print("\n--------------------------- End Least Squares")
 
         # Getting interpolated vectors of X and Y to build smooth curve (count of points depends on the resolution parameter)
         self.interpolated_vectorX, self.interpolated_vectorY = self.get_interpolated_xy_vectors()
@@ -98,24 +109,82 @@ class LeastSquaresApproximator:
         if makeplot:
             self.make_plot()
 
-        #return vectorF, vector_deltaF
-
     def autofunc(self, solvec, x):
         return sum([solvec[i] * (x ** i) for i in range(0, len(solvec))])
 
-    def get_interpolated_xy_vectors(self):
+    def get_x_from_y_estimated(self, y, lower_border = -0.5, upper_border = 0.5, max_iterations=500, tolerance=0.0001):
+        """ Finds the estimated x by the Bisection Method
+        """
+        return roots.RootFinder(
+            self.autofunc if self.customfunc is None else self.customfunc,
+            solution_vectorX=self.solution_vectorX
+        ).bisection(
+            lower=y + lower_border,
+            upper=y + upper_border,
+            max_iterations=max_iterations,
+            tolerance=tolerance
+        )
+
+    def get_x_from_y_closest(self, y, vectorX=None, vectorY=None):
+        """ Returns the closest_x value with the index
+        """
+        # Get the closest known x from the vectorX and the corresponding y from the vectorY
+        closest_list = []
+        for v in self.interpolated_vectorY if vectorY is None else vectorY:
+            closest_list.append(abs(y - v))
+        closest_y_index = closest_list.index(min(closest_list))
+        closest_x = self.interpolated_vectorX[closest_y_index] if vectorX is None else vectorX[closest_y_index]
+        return closest_x, closest_y_index
+
+    def get_closest_boundary_points(self, y):
+        closest_x = self.get_x_from_y_closest(y)
+        index = 0
+        for i in range(0, len(self.vectorX)):
+            if self.vectorX[i] > closest_x[0]:
+                index = i
+                break
+        return self.vectorX[index - 1], self.vectorF[index - 1], self.vectorX[index], self.vectorF[index]
+
+    def get_x_from_y_interpolated(self, y, resolution = 100):
+        # Get the closest known x from the reinterpolated vector X and the corresponding y from the reinterpolated vector Y
+        xvec, yvec = self.get_interpolated_xy_vectors(resolution)
+        new_closest = self.get_x_from_y_closest(y, xvec, yvec)
+        return xvec[new_closest[1]]
+    
+    def interpolate(self, currentX, deltaX, resolution):
+        interpolated_vectorX = list()
+        interpolated_vectorY = list()
+
+        step = deltaX / resolution
+        for i in range(0, resolution):
+            new_y = self.autofunc(self.solution_vectorX, currentX) if self.customfunc is None else self.customfunc(self.solution_vectorX, currentX)
+            interpolated_vectorY.append(new_y)
+            interpolated_vectorX.append(currentX)
+            currentX += step
+
+        return interpolated_vectorX, interpolated_vectorY
+
+    def get_y_from_x(self, x):
+        if self.customfunc is None:
+            return self.autofunc(self.solution_vectorX, x)
+        else:
+            return self.customfunc(self.solution_vectorX, x)
+
+    def get_interpolated_xy_vectors(self, custom_resolution=None):
         """ Creates the interpolated lists of X and Y with points count specified by resolution parameter.
         """
         # Initializing empty out vectors
         out_vectorX = list()
         out_vectorY = list()
 
+        resolution = self.resolution if custom_resolution is None else custom_resolution
+
         # Getting values interpolated between x[i] and x[i+1] points
         for i in range(0, len(self.vectorX) - 1):
-            current_step = (self.vectorX[i + 1] - self.vectorX[i]) / self.resolution if self.customstep is None else self.customstep
+            current_step = (self.vectorX[i + 1] - self.vectorX[i]) / resolution if self.customstep is None else self.customstep
             current_x = self.vectorX[i]
             # Adding each point to the out vector
-            for j in range(0, self.resolution):
+            for j in range(0, resolution):
                 # Calculating interpolated Y point and adding it to the out Y vector
                 out_vectorY.append(self.autofunc(self.solution_vectorX, current_x) 
                     if self.customfunc is None else self.customfunc(self.solution_vectorX, current_x))
@@ -134,7 +203,7 @@ class LeastSquaresApproximator:
         plt.figure("Least Squares by dewhitee")
         plt.title("Least Squares approximation with k = " + str(self.k_approx_order))
         plt.plot(self.vectorX, self.vectorY, 'bs', self.vectorX, self.vectorF, 'g--', self.vectorX, self.vectorF, 'g^')
-        plt.plot(self.interpolated_vectorX, self.interpolated_vectorY, 'y-')
+        plt.plot(self.interpolated_vectorX, self.interpolated_vectorY, 'y--')
         plt.xlabel("X values")
         plt.ylabel("Y values")
         for i in range(0, len(self.vectorX) - 1):
