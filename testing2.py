@@ -17,10 +17,22 @@ test_1_matrix = [
 
 test_1_vars = ['x1', 'x2', 'x3', 'x4']
 
-# -----
-mh.solve_with_gauss_elimination(test_1_matrix, test_1_vars, True, "Initial matrix")
+print(np.linalg.cond(mh.get_matrixA(test_1_matrix)))
 
 # -----
-mh.solve_with_gauss_seidel(test_1_matrix, test_1_equations, test_1_vars, 0.0001, True, "Matrix with B + deltaB")
+mh.solve_with_gauss_elimination(
+    matrixAB=test_1_matrix, 
+    vars=test_1_vars, 
+    print_only_results=True, 
+    matrix_name="Initial matrix")
+
+# -----
+mh.solve_with_gauss_seidel(
+    matrixAB=test_1_matrix, 
+    equations=test_1_equations, 
+    vars=test_1_vars, e=0.001, 
+    print_only_results=True, 
+    matrix_name="Initial matrix", 
+    use_matrix=True)
 
 #print(mh.get_matrix_determinant(mh.get_matrixA(test_1_matrix)))

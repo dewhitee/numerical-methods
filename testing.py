@@ -32,7 +32,7 @@ matrix_1 = [
     [144, 12, 1, 279.2],
 ]
 
-matrix_1_vectorX = ge.gauss_elimination(matrix_1, matrix_1_vars)
+matrix_1_vectorX = ge.GaussElimination(matrix_1, matrix_1_vars).solution_vectorX
 
 mh.A_print(matrix_1, matrix_1_vars)
 mh.B_print(matrix_1, ['b1', 'b2', 'b3'])
@@ -57,14 +57,14 @@ print("\nmatrix_1_cond =", matrix_1_cond)
 
 # -- Experimental condition number:
 # delta B -> nulling all elements of vector B except the abs(max element of B)
-matrix_1_deltaB = mh.get_deltaB(matrix_1)
+matrix_1_deltaB = mh.get_deltaB_from_whole_matrix(matrix_1)
 
 print("\ndelta B vector:", matrix_1_deltaB)
 
-matrix_1_modified = mh.append_vectorB(matrix_1, array(matrix_1_B) + array(matrix_1_deltaB))
+matrix_1_modified = mh.append_vectorB_to_whole_matrix(matrix_1, array(matrix_1_B) + array(matrix_1_deltaB))
 mh.full_print(matrix_1_modified, matrix_1_vars, 'Modified matrix_1')
 
-matrix_1_deltaX = ge.gauss_elimination(matrix_1_modified, matrix_1_vars)
+matrix_1_deltaX = ge.GaussElimination(matrix_1_modified, matrix_1_vars).solution_vectorX
 
 print("delta X vector = ", matrix_1_deltaX)
 

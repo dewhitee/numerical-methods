@@ -1,5 +1,24 @@
 ![all labworks](https://media.discordapp.net/attachments/578480014740422676/783811352182652938/unknown.png)
-
+#### 1 лаб 
+  Метод исключения Гаусса с ведущим элементом;
+  
+  Метод Гаусса-Зейделя;
+  
+  Эесперементальное определение числа обусловленности матрицы;
+#### 2 лаб   
+  Аппроксимация по методу наименьших квадратов(МНК);
+ 
+  Сплайн интерполяция;
+  
+  Графическое сравнение двух методов;
+#### 3 лаб  
+  Метод бисекции(деление отрезка еа пополам);
+  
+  Метод парабол;
+#### 4 лаб
+  Метод Эйлера;
+  
+  Метод Рунге-Кутта 4-го порядка;
 # 1 ЛАБ
 1) Гаусс с ведущим элементом 
 
@@ -43,3 +62,26 @@ det(A)=0    если    cond(A) = ∞ (бессконечность)
 
 ![alt text](https://github.com/dewhitee/numerical-methods/blob/main/Images/Oboznacenie%20matrici%201.png)
 ![alt text](https://github.com/dewhitee/numerical-methods/blob/main/Images/Oboznacenie%20matrici%202.png)
+
+# 2 лаб   
+#### 1)Аппроксимация по методу наименьших квадратов(МНК);
+ 
+  ![alt text](https://github.com/dewhitee/numerical-methods/blob/main/Images/%D0%90%D0%BF%D0%BF%D1%80%D0%BE%D0%BA%D1%81%D0%B8%D0%BC%D0%B0%D1%86%D0%B8%D1%8F.png)
+  ![alt text](https://github.com/dewhitee/numerical-methods/blob/main/Images/%D0%9C%D0%B5%D1%82%D0%BE%D0%B4%20%D0%9C%D0%9D%D0%9A.png)
+  ![alt text](https://github.com/dewhitee/numerical-methods/blob/main/Images/%D0%9C%D0%B5%D1%82%D0%BE%D0%B4%20%D0%9C%D0%9D%D0%9A%202.png)
+  
+#### 2)Сплайн интерполяция
+  
+ ![alt text](https://github.com/dewhitee/numerical-methods/blob/main/Images/%D0%9A%D1%83%D0%B1%D0%B8%D1%87%D0%B5%D1%81%D0%BA%D0%B8%D0%B9%20%D1%81%D0%BF%D0%BB%D0%B0%D0%B9%D0%BD.png)
+ ![alt text](https://github.com/dewhitee/numerical-methods/blob/main/Images/%D0%9A%D1%83%D0%B1%D0%B8%D1%87%D0%B5%D1%81%D0%BA%D0%B8%D0%B9%20%D1%81%D0%BF%D0%BB%D0%B0%D0%B9%D0%BD%20%D0%B0%D0%BB%D0%B3%D0%BE%D1%80%D0%B8%D1%82%D0%BC%202.png)
+ ![alt text](https://github.com/dewhitee/numerical-methods/blob/main/Images/%D0%9A%D1%83%D0%B1%D0%B8%D1%87%D0%B5%D1%81%D0%BA%D0%B8%D0%B9%20%D1%81%D0%BF%D0%BB%D0%B0%D0%B9%D0%BD%20%D0%B0%D0%BB%D0%B3%D0%BE%D1%80%D0%B8%D1%82%D0%BC%203.png)
+ ![alt text](https://github.com/dewhitee/numerical-methods/blob/main/Images/%D0%9A%D1%83%D0%B1%D0%B8%D1%87%D0%B5%D1%81%D0%BA%D0%B8%D0%B9%20%D1%81%D0%BF%D0%BB%D0%B0%D0%B9%D0%BD%204.png)
+ 
+ ##### Кубический сплайн алгоритм:
+ 
+ ![alt text](https://github.com/dewhitee/numerical-methods/blob/main/Images/%D0%9A%D1%83%D0%B1%D0%B8%D1%87%D0%B5%D1%81%D0%BA%D0%B8%D0%B9%20%D1%81%D0%BF%D0%BB%D0%B0%D0%B9%D0%BD%20%D0%B0%D0%BB%D0%B3%D0%BE%D1%80%D0%B8%D1%82%D0%BC.png)
+ ![alt text](https://github.com/dewhitee/numerical-methods/blob/main/Images/%D0%9A%D1%83%D0%B1%D0%B8%D1%87%D0%B5%D1%81%D0%BA%D0%B8%D0%B9%20%D1%81%D0%BF%D0%BB%D0%B0%D0%B9%D0%BD%20%D0%B0%D0%BB%D0%B3%D0%BE%D1%80%D0%B8%D1%82%D0%BC%202.png)
+ ![alt text](https://github.com/dewhitee/numerical-methods/blob/main/Images/%D0%9A%D1%83%D0%B1%D0%B8%D1%87%D0%B5%D1%81%D0%BA%D0%B8%D0%B9%20%D1%81%D0%BF%D0%BB%D0%B0%D0%B9%D0%BD%20%D0%B0%D0%BB%D0%B3%D0%BE%D1%80%D0%B8%D1%82%D0%BC%203.png)
+ ![alt text](https://github.com/dewhitee/numerical-methods/blob/main/Images/%D0%9A%D1%83%D0%B1%D0%B8%D1%87%D0%B5%D1%81%D0%BA%D0%B8%D0%B9%20%D1%81%D0%BF%D0%BB%D0%B0%D0%B9%D0%BD%20%D0%B0%D0%BB%D0%B3%D0%BE%D1%80%D0%B8%D1%82%D0%BC%204.png)
+  
+  ##### 3)Графическое сравнение двух методов;

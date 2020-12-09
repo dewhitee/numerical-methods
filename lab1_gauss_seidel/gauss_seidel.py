@@ -1,3 +1,5 @@
+import copy
+
 # Algorithm
 # 1. Start
 # 2. Arrange given system of linear equations in diagonally dominant form
@@ -11,38 +13,89 @@
 # 8. Set x0 = x1, y0 = y1, z0 = z1 and so on and goto step 6
 # 9. Print value of x1, y1, z1 and so on
 # 10. Stop
+class GaussSeidel:
+    def __init__(self, equations: list, vars: list, e: float, print_only_results: bool = False, matrix_name: str = "", matrixAB: list = None, 
+    print_results=True, without_print=False, max_iterations=1000, show_errors_list=False, auto_adjust_matrix=True):
+        """ 
+        equations -- list of lambda equations with any count of arguments.
+        Example: [lambda x, y: x + y, lambda x, y: x - y]
 
-def gauss_seidel(equations: list, vars: list, e: float, print_only_results: bool = False, matrix_name: str = "") -> list:
-    """ 
-    equations -- list of lambda equations with any count of arguments.
-    Example: [lambda x, y: x + y, lambda x, y: x - y]
+        vars -- list of symbols to specify the names of the equations variables.
+        Example: ['x', 'y', 'z']
 
-    vars -- list of symbols to specify the names of the equations variables.
-    Example: ['x', 'y', 'z']
+        e -- tolerable error
+        Example: 0.001
 
-    e -- tolerable error
-    Example: 0.001
+        matrix -- the whole matrix (AB)
 
-    returns list of solution variables X
-    """
-    iteration = 1
+        Note: you can also pass the matrix instead of equations
 
-    # Reading tolerable error (required accuracy)
-    #e = float(input('Enter tolerable error: '))
+        returns list of solution variables X
+        """
 
-    # Implementation of Gauss Seidel Iteration
-    print('\n-------------------------------------Gauss Seidel - ' + matrix_name)
-    if not print_only_results:
-        print('Iter', *vars, sep = "\t")
+        # Reading tolerable error (required accuracy)
+        #e = float(input('Enter tolerable error: '))
 
-    condition = True
+        # Implementation of Gauss Seidel Iteration
+        if not without_print:
+            print('\n-------------------------------------Gauss Seidel - ' + matrix_name)
+            print('Using equations list...') if matrixAB is None else print ('Using matrix...')
+            print('With accuracy of ' + str(e) + '\n')
+            if not print_only_results:
+                print('Iter', *[f'{v:<12}' for v in vars], sep="\t")
 
-    # Initializing all variables values with zero
-    vars_values = [0] * len(equations)
+        condition = True
 
-    while condition:
-        e_list = []
-        
+        # Initializing all variables values with zero if using equations
+        # or set each X as B if using matrix, as the first approximation
+        vars_values = [0] * len(equations) if matrixAB is None else [row[-1] for row in matrixAB]
+
+        if not without_print and not print_only_results:
+            print(0, *[f'{"%0.4f":<12}' % elem for elem in vars_values], sep="\t")
+
+        iteration = 1
+
+        # Adjust matrix
+        adjusted_matrixAB = None
+        if auto_adjust_matrix:
+            adjusted_matrixAB = self.adjust_matrix(matrixAB)
+            if not without_print:
+                print("(Auto adjustment of matrix is enabled)\nAdjusted matrix:\n", adjusted_matrixAB)
+        else:
+            adjusted_matrixAB = matrixAB
+
+        while condition:
+            e_list = []
+
+            # Calculating all variables
+            if adjusted_matrixAB is None:
+                self.iterate_equations(equations, e_list, vars_values)
+            else:
+                self.iterate_matrix(adjusted_matrixAB, e_list, vars_values)
+
+            if not without_print and not print_only_results:
+                print(iteration, *[f'{"%0.4f":<12}' % elem for elem in vars_values], sep="\t")
+            iteration += 1
+
+            if show_errors_list:
+                print("Errors:", *[f'{"%0.4f":<12}' % elem for elem in e_list], sep="\t")
+
+            # Checking if all current errors are greater than required error e
+            condition = self.check_error_rate(e_list, e)
+
+            if iteration > max_iterations:
+                break
+
+        if not without_print:
+            print('\nSolution:')
+            for (var, val) in zip(vars, vars_values):
+                print(var,'= %0.3f' %(val))
+            print('-------------------------------------\n')
+
+        self.vars_values = vars_values
+        self.solution_vectorX = vars_values
+
+    def iterate_equations(self, equations, e_list, vars_values):
         # Calculating all variables
         for i, eq in enumerate(equations):
             # Calculating the i-th lambda of equations list
@@ -53,24 +106,61 @@ def gauss_seidel(equations: list, vars: list, e: float, print_only_results: bool
 
             # Set current i-th vars_values variable to it's newly calculated new_value
             vars_values[i] = new_value
-        if not print_only_results:
-            print(iteration, *["%0.4f" % elem for elem in vars_values], sep="\t")
-        iteration += 1
 
-        # Checking if all current errors are greater than required error e
-        condition = check_error_rate(e_list, e)
+    def iterate_matrix(self, matrix, e_list, vars_values):
+        # Calculating all variables
+        for i, row in enumerate(matrix):
+            # Calculating the i-th X variable
+            # Initializing current X with B coefficient value
+            new_value = row[-1]
+            for j in range(0, len(row) - 1):
+                if i != j:
+                    # Subtracting the non-diagonal values multiplied by calculated previously values
+                    new_value -= (row[j] * vars_values[j])
 
-    print('\nSolution:')
-    for (var, val) in zip(vars, vars_values):
-        print(var,'= %0.3f' %(val))
+            # Adding the value on a diagonal of the matrix
+            new_value *= 1/row[i]
 
-    print('-------------------------------------\n')
+            # Adding i-th error to the e_list
+            e_list.append(abs(vars_values[i] - new_value))
 
-    return vars_values
+            # Set current i-th vars_values variable to it's newly calculated new_value
+            vars_values[i] = new_value
+
+    def check_error_rate(self, e_list: list, e):
+        return all([current_e > e for current_e in e_list])
+
+    def adjust_matrix(self, matrixAB):
+        """ Returns the matrixAB with all rows placed in such way,
+        that main diagonal has largest values by module
+        """
+        if matrixAB is None:
+            return None
+
+        out_matrix = copy.deepcopy(matrixAB)
+        for i, row in enumerate(out_matrix):
+            current_max = 0
+            current_max_index = 0
+
+            # Iterating over the i-th column values
+            for j in range(i, len(out_matrix)):
+                #print(abs(current_max), "<", abs(out_matrix[j][i]))
+                if abs(current_max) < abs(out_matrix[j][i]):
+                    current_max = out_matrix[j][i]
+                    current_max_index = j
+
+            #print("Current max list is: ",
+            #      out_matrix[current_max_index], "with index", current_max_index)
+
+            # Swap max row with the current row
+            out_matrix[i], out_matrix[current_max_index] = out_matrix[current_max_index], out_matrix[i]
+
+        return out_matrix
+
+            
 
 
-def check_error_rate(e_list: list, e):
-    return all([current_e > e for current_e in e_list])
+
 
 # Testing
 
