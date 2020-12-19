@@ -1,5 +1,6 @@
 import copy
 
+
 # Algorithm
 # 1. Start
 # 2. Arrange given system of linear equations in diagonally dominant form
@@ -14,8 +15,10 @@ import copy
 # 9. Print value of x1, y1, z1 and so on
 # 10. Stop
 class GaussSeidel:
-    def __init__(self, equations: list, vars: list, e: float, print_only_results: bool = False, matrix_name: str = "", matrixAB: list = None, 
-    print_results=True, without_print=False, max_iterations=1000, show_errors_list=False, auto_adjust_matrix=True):
+    def __init__(self, equations: list, vars: list, e: float, print_only_results: bool = False, matrix_name: str = "",
+                 matrixAB: list = None,
+                 print_results=True, without_print=False, max_iterations=1000, show_errors_list=False,
+                 auto_adjust_matrix=True):
         """ 
         equations -- list of lambda equations with any count of arguments.
         Example: [lambda x, y: x + y, lambda x, y: x - y]
@@ -34,7 +37,7 @@ class GaussSeidel:
         """
         if not without_print:
             print('\n-------------------------------------Gauss Seidel - ' + matrix_name)
-            print('Using equations list...') if matrixAB is None else print ('Using matrix...')
+            print('Using equations list...') if matrixAB is None else print('Using matrix...')
             print('With accuracy of ' + str(e) + '\n')
             if not print_only_results:
                 print('Iter', *[f'{v:<12}' for v in vars], sep="\t")
@@ -85,7 +88,7 @@ class GaussSeidel:
         if not without_print:
             print('\nSolution:')
             for (var, val) in zip(vars, vars_values):
-                print(var,'= %0.3f' %(val))
+                print(var, '= %0.3f' % (val))
             print('-------------------------------------\n')
 
         self.vars_values = vars_values
@@ -115,7 +118,7 @@ class GaussSeidel:
                     new_value -= (row[j] * vars_values[j])
 
             # Adding the value on a diagonal of the matrix
-            new_value *= 1/row[i]
+            new_value *= 1 / row[i]
 
             # Adding i-th error to the e_list
             e_list.append(abs(vars_values[i] - new_value))
@@ -140,12 +143,12 @@ class GaussSeidel:
 
             # Iterating over the i-th column values
             for j in range(i, len(out_matrix)):
-                #print(abs(current_max), "<", abs(out_matrix[j][i]))
+                # print(abs(current_max), "<", abs(out_matrix[j][i]))
                 if abs(current_max) < abs(out_matrix[j][i]):
                     current_max = out_matrix[j][i]
                     current_max_index = j
 
-            #print("Current max list is: ",
+            # print("Current max list is: ",
             #      out_matrix[current_max_index], "with index", current_max_index)
 
             # Swap max row with the current row
@@ -153,37 +156,33 @@ class GaussSeidel:
 
         return out_matrix
 
-            
-
-
-
 
 # Testing
 
 test_equations = [
-    lambda x, y, z: (17 - y + 2*z) / 20,
-    lambda x, y, z: (-18 - 3*x + z) / 20,
-    lambda x, y, z: (25 - 2*x + 3*y) / 20
+    lambda x, y, z: (17 - y + 2 * z) / 20,
+    lambda x, y, z: (-18 - 3 * x + z) / 20,
+    lambda x, y, z: (25 - 2 * x + 3 * y) / 20
 ]
 
-#gauss_seidel(test_equations, ['x','y','z'], 0.001)
+# gauss_seidel(test_equations, ['x','y','z'], 0.001)
 
 test_equations_2 = [
-    lambda x1, x2, x3, x4: 1/20.9*(21.70 - 1.2*x2 - 2.1*x3 - 0.9*x4),
-    lambda x1, x2, x3, x4: 1/21.2*(27.46 - 1.2*x1 - 1.5*x3 - 2.5*x4),
-    lambda x1, x2, x3, x4: 1/19.8*(28.76 - 2.1*x1 - 1.5*x2 - 1.3*x4),
-    lambda x1, x2, x3, x4: 1/32.1*(49.72 - 0.9*x1 - 2.5*x2 - 1.3*x3)
+    lambda x1, x2, x3, x4: 1 / 20.9 * (21.70 - 1.2 * x2 - 2.1 * x3 - 0.9 * x4),
+    lambda x1, x2, x3, x4: 1 / 21.2 * (27.46 - 1.2 * x1 - 1.5 * x3 - 2.5 * x4),
+    lambda x1, x2, x3, x4: 1 / 19.8 * (28.76 - 2.1 * x1 - 1.5 * x2 - 1.3 * x4),
+    lambda x1, x2, x3, x4: 1 / 32.1 * (49.72 - 0.9 * x1 - 2.5 * x2 - 1.3 * x3)
 ]
 
-#gauss_seidel(test_equations_2, ['x1', 'x2', 'x3', 'x4'], 0.001)
+# gauss_seidel(test_equations_2, ['x1', 'x2', 'x3', 'x4'], 0.001)
 
 
 # 1, 3, 4 var systems testing
 
 var_1_equations = [
-    lambda x1, x2, x3, x4: 1/(2 - x1 - 2*x2 - x3),
-    lambda x1, x2, x3, x4: 1/3*(-1 * x1 - 5*x2 - x3),
-    lambda x1, x2, x3, x4: 1/(-7)*(-2 * x1 + x3)
+    lambda x1, x2, x3, x4: 1 / (2 - x1 - 2 * x2 - x3),
+    lambda x1, x2, x3, x4: 1 / 3 * (-1 * x1 - 5 * x2 - x3),
+    lambda x1, x2, x3, x4: 1 / (-7) * (-2 * x1 + x3)
 ]
 
-#gauss_seidel(var_1_equations, ['x1', 'x2', 'x3', 'x4'], 0.001)
+# gauss_seidel(var_1_equations, ['x1', 'x2', 'x3', 'x4'], 0.001)

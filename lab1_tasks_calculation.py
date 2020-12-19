@@ -14,7 +14,7 @@ matrix_1 = [
 ge.GaussElimination(
     matrixAB=matrix_1,
     vars=['x1','x2','x3'],
-    print_only_results=True,
+    print_only_results=False,
     matrix_name="First matrix (Elimination)"
 )
 
@@ -94,20 +94,20 @@ def timer_seidel3():
         without_print=True
     )
 
-print("Gauss Elimination - time elapsed\n(number of calls = 10000):\n", timeit.timeit("timer_elimination()", 
-    setup="from __main__ import timer_elimination", number=10000), 'seconds \n')
-print("Gauss Seidel with auto-adjustment of matrix and e = 0.00001 - time elapsed\n (number of calls = 10000):\n", timeit.timeit('timer_seidel()',
-    setup="from __main__ import timer_seidel", number=10000), 'seconds\n')
-print("Gauss Seidel without auto-adjustment of matrix and e = 0.00001 - time elapsed\n (number of calls = 10000):\n", timeit.timeit('timer_seidel2()',
-    setup="from __main__ import timer_seidel2", number=10000), 'seconds\n')
-print("Gauss Seidel without auto-adjustment of matrix and e = 0.0001 - time elapsed\n (number of calls = 10000):\n", timeit.timeit('timer_seidel3()',
-    setup="from __main__ import timer_seidel3", number=10000), 'seconds\n')
+#print("Gauss Elimination - time elapsed\n(number of calls = 10000):\n", timeit.timeit("timer_elimination()", 
+#    setup="from __main__ import timer_elimination", number=10000), 'seconds \n')
+#print("Gauss Seidel with auto-adjustment of matrix and e = 0.00001 - time elapsed\n (number of calls = 10000):\n", timeit.timeit('timer_seidel()',
+#    setup="from __main__ import timer_seidel", number=10000), 'seconds\n')
+#print("Gauss Seidel without auto-adjustment of matrix and e = 0.00001 - time elapsed\n (number of calls = 10000):\n", timeit.timeit('timer_seidel2()',
+#    setup="from __main__ import timer_seidel2", number=10000), 'seconds\n')
+#print("Gauss Seidel without auto-adjustment of matrix and e = 0.0001 - time elapsed\n (number of calls = 10000):\n", timeit.timeit('timer_seidel3()',
+#    setup="from __main__ import timer_seidel3", number=10000), 'seconds\n')
 
 
 ge.GaussElimination(
     matrixAB=matrix_2,
     vars=['x1', 'x2', 'x3', 'x4'],
-    print_only_results=True,
+    print_only_results=False,
     matrix_name="Second matrix (Elimination)",
     without_print=False
 )

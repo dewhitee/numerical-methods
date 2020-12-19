@@ -218,11 +218,11 @@ def least_squares_2():
     )
 
 
-print("Cubic Spline Interpolation - time elapsed\n(number of calls = 10000):\n", timeit.timeit("cubic_spline_0()",
-    setup="from __main__ import cubic_spline_0", number=10000), 'seconds \n')
-print("Least Squares Approximation with k = 2 - time elapsed\n (number of calls = 10000):\n", timeit.timeit('least_squares_0()',
-    setup="from __main__ import least_squares_0", number=10000), 'seconds\n')
-print("Least Squares Approximation with k = 3 - time elapsed\n (number of calls = 10000):\n", timeit.timeit('least_squares_1()',
-    setup="from __main__ import least_squares_1", number=10000), 'seconds\n')
-print("Least Squares Approximation with k = 5 - time elapsed\n (number of calls = 10000):\n", timeit.timeit('least_squares_2()',
-    setup="from __main__ import least_squares_2", number=10000), 'seconds\n')
+#print("Cubic Spline Interpolation - time elapsed\n(number of calls = 10000):\n", timeit.timeit("cubic_spline_0()",
+#    setup="from __main__ import cubic_spline_0", number=10000), 'seconds \n')
+#print("Least Squares Approximation with k = 2 - time elapsed\n (number of calls = 10000):\n", timeit.timeit('least_squares_0()',
+#    setup="from __main__ import least_squares_0", number=10000), 'seconds\n')
+#print("Least Squares Approximation with k = 3 - time elapsed\n (number of calls = 10000):\n", timeit.timeit('least_squares_1()',
+#    setup="from __main__ import least_squares_1", number=10000), 'seconds\n')
+#print("Least Squares Approximation with k = 5 - time elapsed\n (number of calls = 10000):\n", timeit.timeit('least_squares_2()',
+#    setup="from __main__ import least_squares_2", number=10000), 'seconds\n')

@@ -1,10 +1,12 @@
 import copy
 
 # Algorithm
+# Straight step:
+# Adjusting matrix by finding the pivot element for each row
+# Nulling bottom-left corner
 #
-#
-#
-#
+# Reverse step:
+# Getting the solution vector X (Calculating from bottom to up)
 # ...
 class GaussElimination:
     def __init__(self, matrixAB: list, vars: list, print_only_results: bool = False, matrix_name: str = "", matrixA=None, vectorB=None, print_results=True, without_print=False):
