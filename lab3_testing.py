@@ -1,19 +1,79 @@
 import roots
 import lab3_parabolic_simpsons_rule.parabolic as p
+import matplotlib.pyplot as plt
+import numpy as np
 
 roots.RootFinder(lambda x: x ** 2 - x - 1, None) \
     .bisection(1, 2)
 
-p.Parabolic(left_border_a=[-4, 35], right_border_b=[2, 11])
+res = p.Parabolic(left_border_a=[1, None], right_border_b=[2, None],
+                  customfunc=lambda val: val ** 3 - val - 1)
+#p.Parabolic(
+#    left_border_a=[-4, 14],
+#    right_border_b=[0, -3],
+#    customfunc=lambda val: val ** 2 - 3
+#)
 
 # Plot with spline interpolation
 import lab2_spline_interpolation.spline_interpolation as si
 import lab2_least_squares.least_squares as ls
 
-xs = [-4, 0, 2]
-ys = [35, -5, 11]
-si.CubicSplineInterpolator(xs, ys).get_xy(makeplot=True, showpoints=True)
-ls.LeastSquaresApproximator(xs, ys, makeplot=True)
+#xs = [-4, 0, 2]
+#ys = [35, -5, 11]
+#ys = [14, -3, 1]
+#si.CubicSplineInterpolator(xs, ys).get_xy(makeplot=True, showpoints=True)
+#ls.LeastSquaresApproximator(xs, ys, makeplot=True,
+#                            customfunc=lambda solvec, newx: newx ** 2)
+
+cubicxs, cubicys = si.CubicSplineInterpolator(res.initial_xs, res.initial_ys).get_xy()
+
+plt.figure("Least Squares approximation with different k values")
+plt.title("Least Squares approximation with different k values")
+plt.plot(
+    cubicxs,
+    cubicys,
+    "c--",
+    res.initial_xs,
+    res.initial_ys,
+    "yo-",
+    res.xs,
+    res.ys,
+    "ro-",
+    res.initial_approx_x,
+    res.customfunc(res.initial_approx_x),
+    "g^",
+    res.final_estimate,
+    res.customfunc(res.final_estimate),
+    "go",
+    res.found_root_1,
+    res.customfunc(res.found_root_1),
+    "bo",
+    res.found_root_2,
+    res.customfunc(res.found_root_2),
+    "b^"
+)
+x = np.linspace(-10, 10, 1000)
+y = res.customfunc(x)
+plt.plot(x, y)
+plt.legend(
+    [
+        "Cubic spline",
+        "Parabolic (initial)",
+        "Parabolic (final segment)",
+        "Initial approximation",
+        "Final estimate (" + str(res.final_estimate) + " ; " + str(res.customfunc(res.final_estimate)) + ")",
+        "Root from parabolic 1 (" + str(res.found_root_1) + " ; " + str(res.customfunc(res.found_root_1)) + ")",
+        "Root from parabolic 2 (" + str(res.found_root_2) + " ; " + str(res.customfunc(res.found_root_2)) + ")",
+        "Parabola with linspace"
+    ]
+)
+plt.axvline(x=0, color="grey")
+plt.axhline(y=0, color='grey')
+plt.axvline(x=res.final_estimate, color="green", linestyle="--")
+plt.axhline(y=res.customfunc(res.final_estimate), color='green', linestyle="--")
+plt.xlabel("X values")
+plt.ylabel("Y values")
+plt.show()
 
 
 def calc_parabola_vertex(x1, y1, x2, y2, x3, y3):
