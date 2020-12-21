@@ -41,7 +41,7 @@ plt.legend(
         "Known points",
         "Found root (Parabolic) (" + str('%0.4f' % rf_parab) + " ; " + str('%0.4f' % rf.function(rf_parab)) + ")",
         "Found root (Bisection) (" + str('%0.4f' % rf_bis) + " ; " + str('%0.4f' % rf.function(rf_bis)) + ")",
-        "Parabola with linspace"
+        "Function graph by linspace"
     ]
 )
 plt.axvline(x=0, color="grey")

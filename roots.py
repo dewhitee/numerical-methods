@@ -59,6 +59,11 @@ class RootFinder:
               f'{"a":<8} | {"b":<8} | {"Estimate (xi)":<20} | {"Error":<16}')
         print('{:-<136}'.format(""))
 
+        if self.function(a) == 0:
+            return a
+        elif self.function(b) == 0:
+            return b
+
         current_x = x0
         prev_x = 0.0
         while iterations < max_iterations:

@@ -1,4 +1,5 @@
 import numpy as np
+import copy
 
 
 class DifferentialEquationsSolver:
@@ -10,6 +11,10 @@ class DifferentialEquationsSolver:
         self.step_h = step_h
         self.method_name = ""
         self.exact_ys = exact_ys
+
+    @staticmethod
+    def compare_errors(approx_ys, exact_ys):
+        return [abs(y2 - y1) for y1, y2 in zip(approx_ys[1:], exact_ys[1:])]
 
     def _get_next_y(self, current_x, current_y):
         return self.function(current_x, current_y)
