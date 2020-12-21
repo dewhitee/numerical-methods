@@ -20,17 +20,24 @@ class DifferentialEquationsSolver:
 
     def _table_header(self):
         if self.exact_ys is None:
-            print(f'{"x":<12} | {"y":<12}')
-            print('{:-<30}'.format(""))
+            print(f'{"x":<16} | {"y":<16}')
+            print('{:-<50}'.format(""))
         else:
-            print(f'{"x":<12} | {"y":<12} | {"Exact value":<12}')
-            print('{:-<40}'.format(""))
+            print(f'{"x":<16} | {"y":<16} | {"Exact value":<16} | {"Error":<16}')
+            print('{:-<70}'.format(""))
+
+    def _get_exact_y_and_error(self, current_x, current_y, i):
+        exact_y = self.function(current_x, current_y)
+        error = abs(current_y - exact_y)
+        return exact_y, error
 
     def _table_line(self, current_x, current_y, i):
         if self.exact_ys is None:
-            print(f'{current_x:<12} | {"%0.8f" % current_y:<12}')
+            print(f'{"%0.8f" % current_x:<16} | {"%0.8f" % current_y:<16}')
         else:
-            print(f'{current_x:<12} | {"%0.8f" % current_y:<12} | {self.exact_ys[i]}')
+            error = abs(current_y - self.exact_ys[i])
+            print(f'{"%0.8f" % current_x:<16} | {"%0.8f" % current_y:<16} | {"%0.8f" % self.exact_ys[i]:<16} | '
+                  f'{"%0.8f" % error:<16}')
 
     def get_xy(self, initial_x, initial_y, last_x):
         xs = np.arange(initial_x, last_x + self.step_h, self.step_h)
@@ -44,6 +51,12 @@ class DifferentialEquationsSolver:
             current_y = self._get_next_y(current_x, current_y)
         print(f'--- End of {self.method_name} ---')
         return xs, ys
+
+
+class Exact(DifferentialEquationsSolver):
+    def __init__(self, function, step_h, exact_ys=None):
+        super().__init__(function, step_h, exact_ys)
+        self.method_name = "Exact"
 
 
 class Euler(DifferentialEquationsSolver):
