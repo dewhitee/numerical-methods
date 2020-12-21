@@ -15,16 +15,21 @@ class RootFinder:
         lower -- a
         upper -- b
         """
-        print("Root condition f(a) * f(b) <= 0:\n",
-              self.function(lower), "*", self.function(upper), "<= 0:",
-              self.function(lower) * self.function(upper) <= 0)
+        print("\n--- Bisection ---\nTolerance =", tolerance, ", Root condition (f(a) * f(b) <= 0) =",
+              self.function(lower) * self.function(upper) <= 0, "(",
+              f'{"%0.5f" % self.function(lower)} * {"%0.5f" % self.function(upper)} = '
+              f'{"%0.5f" % (self.function(lower) * self.function(upper))}',
+              "<= 0)")
+        print(f'{"Iteration":<10} | {"Estimate":<20} | {"Error":<16}')
+        print('{:-<80}'.format(""))
 
         iterations = 0
         while iterations < max_iterations:
             midpoint = (lower + upper) / 2.0
 
             if midpoint == 0 or abs(upper - lower) <= tolerance:
-                print("---\niterations =", iterations, ", final estimate =", midpoint)
+                print(f'{iterations:<10} | {"%0.8f" % midpoint:<20} | {"%0.8f" % abs(upper - lower):<16}')
+                print("--- End of Bisection ---\n")
                 return midpoint
             #if self.function(self.solvec, midpoint) > 0:
             if self.function(midpoint) * self.function(lower) <= 0:
@@ -32,16 +37,27 @@ class RootFinder:
             else:
                 lower = midpoint
             iterations += 1
-            print("i =", iterations, "current estimate =", (lower + upper) / 2.0, ", error =", abs(upper - lower))
+            print(f'{iterations:<10} | {"%0.8f" % ((lower + upper) / 2.0):<20} | {"%0.8f" % abs(upper - lower):<16}')
+            #print("i =", iterations, "current estimate =", (lower + upper) / 2.0, ", error =", abs(upper - lower))
         self.final_estimate = (lower + upper) / 2.0
         self.iterations = iterations
-        print("---\niterations =", iterations, ", final estimate =", self.final_estimate)
+        #print("---\niterations =", iterations, ", final estimate =", self.final_estimate)
+        print(f'{iterations:<10} | {"%0.8f" % self.final_estimate:<16} | {"%0.8f" % abs(upper - lower):<16}')
+        print("--- End of Bisection ---\n")
         return self.final_estimate
 
     def parabolic(self, a, b, max_iterations=50, tolerance=0.0001):
         iterations = 0
         x0 = (a + b) / 2
+        print("\n--- Parabolic (Mueller's) ---\nTolerance =", tolerance, ", Root condition (f(a) * f(b) <= 0) =",
+              self.function(a) * self.function(b) <= 0, "(",
+              f'{"%0.5f" % self.function(a)} * {"%0.5f" % self.function(b)} = '
+              f'{"%0.5f" % (self.function(a) * self.function(b))}',
+              "<= 0)")
         print("Initial x's =", a, ",", x0, ",", b)
+        print(f'{"Iteration":<10} | {"a0":<8} | {"a1":<8} | {"a2":<8} | {"Root 1":<12} | {"Root 2":<12} | '
+              f'{"a":<8} | {"b":<8} | {"Estimate (xi)":<20} | {"Error":<16}')
+        print('{:-<136}'.format(""))
         current_x = x0
         prev_x = 0.0
         while iterations < max_iterations:
@@ -72,14 +88,21 @@ class RootFinder:
             elif a <= root_2 <= b or a >= root_2 >= b:
                 current_x = root_2
 
+            print(f'{iterations:<10} | {"%0.4f" % a0:<8} | {"%0.4f" % a1:<8} | {"%0.4f" % a2:<8} | '
+                  f'{"%0.4f" % root_1:<12} | {"%0.4f" % root_2:<12} | '
+                  f'{"%0.4f" % a:<8} | {"%0.4f" % b:<8} | {"%0.8f" % current_x:<20} | '
+                  f'{"%0.8f" % abs(current_x - prev_x):<16}')
+
             if abs(current_x - prev_x) <= tolerance:
-                print("i =", iterations, ", current estimate =", current_x, ", error =", abs(current_x - prev_x))
+                #print("i =", iterations, ", current estimate =", current_x, ", error =", abs(current_x - prev_x))
+                print("--- End of Parabolic (Mueller's) ---\n")
                 return current_x
 
             #print("i =", iterations, ", current estimate =", current_x, ", error =", abs(current_x - prev_x))
             prev_x = current_x
             iterations += 1
-        print("i =", iterations, ", current estimate =", current_x, ", error =", abs(current_x - prev_x))
+        #print("i =", iterations, ", current estimate =", current_x, ", error =", abs(current_x - prev_x))
+        print("--- End of Parabolic ---\n")
         return current_x
 
     def get_coefficients_lagrange(self, x, y):

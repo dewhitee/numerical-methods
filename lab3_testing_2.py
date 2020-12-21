@@ -12,10 +12,10 @@ def f1(x):
 def f2(x):
     x ** 3 - x - 1
 
-x1, x2 = 1.5, 2
+x1, x2 = -1.5, 3
 
-rf = roots.RootFinder(lambda x: math.sqrt(4 - x ** 2) / x, None)
-rf_bis = rf.bisection(x1, x2, tolerance=0.000001)
+rf = roots.RootFinder(lambda x: x / (x + 3) ** 3, None)
+rf_bis = rf.bisection(x1, x2, max_iterations=200)
 rf_parab = rf.parabolic(x1, x2, max_iterations=200)
 print("Bisection =", '%0.5f' % rf_bis)
 print("Parabolic =", '%0.5f' % rf_parab)
