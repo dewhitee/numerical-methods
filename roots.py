@@ -3,6 +3,7 @@ import math
 from scipy.interpolate import lagrange
 from numpy.polynomial.polynomial import Polynomial
 
+
 class RootFinder:
     def __init__(self, function, solution_vectorX):
         self.function = function
@@ -10,16 +11,19 @@ class RootFinder:
         self.final_estimate = 0
         self.iterations = 0
 
+    def _description_line(self, method_name, a, b, tolerance):
+        print(f'\n--- {method_name} ---\nTolerance =', tolerance, ", Root condition (f(a) * f(b) <= 0) =",
+              self.function(a) * self.function(b) <= 0, "(",
+              f'{"%0.5f" % self.function(a)} * {"%0.5f" % self.function(b)} = '
+              f'{"%0.5f" % (self.function(a) * self.function(b))}',
+              "<= 0)")
+
     def bisection(self, lower, upper, max_iterations=500, tolerance=0.0001):
         """ Finds the root of the function by the Bisection Method
         lower -- a
         upper -- b
         """
-        print("\n--- Bisection ---\nTolerance =", tolerance, ", Root condition (f(a) * f(b) <= 0) =",
-              self.function(lower) * self.function(upper) <= 0, "(",
-              f'{"%0.5f" % self.function(lower)} * {"%0.5f" % self.function(upper)} = '
-              f'{"%0.5f" % (self.function(lower) * self.function(upper))}',
-              "<= 0)")
+        self._description_line("Bisection", lower, upper, tolerance)
         print(f'{"Iteration":<10} | {"Estimate":<20} | {"Error":<16}')
         print('{:-<80}'.format(""))
 
@@ -49,30 +53,24 @@ class RootFinder:
     def parabolic(self, a, b, max_iterations=50, tolerance=0.0001):
         iterations = 0
         x0 = (a + b) / 2
-        print("\n--- Parabolic (Mueller's) ---\nTolerance =", tolerance, ", Root condition (f(a) * f(b) <= 0) =",
-              self.function(a) * self.function(b) <= 0, "(",
-              f'{"%0.5f" % self.function(a)} * {"%0.5f" % self.function(b)} = '
-              f'{"%0.5f" % (self.function(a) * self.function(b))}',
-              "<= 0)")
+        self._description_line("Parabolic (Mueller's)", a, b, tolerance)
         print("Initial x's =", a, ",", x0, ",", b)
         print(f'{"Iteration":<10} | {"a0":<8} | {"a1":<8} | {"a2":<8} | {"Root 1":<12} | {"Root 2":<12} | '
               f'{"a":<8} | {"b":<8} | {"Estimate (xi)":<20} | {"Error":<16}')
         print('{:-<136}'.format(""))
+
         current_x = x0
         prev_x = 0.0
         while iterations < max_iterations:
             # Step 3 - get Y values from X ---
             xs = [a, current_x, b]
             ys = [self.function(a), self.function(x0), self.function(b)]
-            #print("i =", iterations, ", xs =", xs, ", ys =", ys)
 
             # Step 3 - get coefficients of a quadratic function ---
             a0, a1, a2 = self.get_coefficients_lagrange(xs, ys)
-            #print("a0 =", a0, ", a1 =", a1, ", a2 =", a2)
 
             # Step 4 - solving quadratic equation ---
             root_1, root_2 = self.solve_quadratic_equation(a0, a1, a2, current_x)
-            #print("root_1 =", root_1, ", root_2 =", root_2)
 
             # Update boundaries
             if self.function(a) * self.function(current_x) < 0:
@@ -94,15 +92,12 @@ class RootFinder:
                   f'{"%0.8f" % abs(current_x - prev_x):<16}')
 
             if abs(current_x - prev_x) <= tolerance:
-                #print("i =", iterations, ", current estimate =", current_x, ", error =", abs(current_x - prev_x))
                 print("--- End of Parabolic (Mueller's) ---\n")
                 return current_x
 
-            #print("i =", iterations, ", current estimate =", current_x, ", error =", abs(current_x - prev_x))
             prev_x = current_x
             iterations += 1
-        #print("i =", iterations, ", current estimate =", current_x, ", error =", abs(current_x - prev_x))
-        print("--- End of Parabolic ---\n")
+        print("--- End of Parabolic (Mueller's) ---\n")
         return current_x
 
     def get_coefficients_lagrange(self, x, y):
