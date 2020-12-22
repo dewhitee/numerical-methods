@@ -12,22 +12,28 @@ class RootFinder:
         self.iterations = 0
 
     def _description_line(self, method_name, a, b, tolerance):
-        print(f'\n--- {method_name} ---\nTolerance =', tolerance, ", Root condition (f(a) * f(b) < 0) =",
-              self.function(a) * self.function(b) < 0, "(",
-              f'{"%0.5f" % self.function(a)} * {"%0.5f" % self.function(b)} = '
-              f'{"%0.5f" % (self.function(a) * self.function(b))}',
-              "< 0)")
+        cond = self.function(a) * self.function(b) <= 0
+        print(f'\n--- {method_name} ---\na = {a}, b = {b}, '
+              f'Tolerance =', tolerance, ", Root condition (f(a) * f(b) <= 0) =",
+              cond, "(",
+              f'{self.function(a)} * {self.function(b)} = '
+              f'{"%0.12f" % (self.function(a) * self.function(b))}',
+              "<= 0)")
 
-    def _initial_check(self, a, b, tolerance):
-        if self.function(a) == 0:
-            print("initial y value of a was ~== 0, returning a (", a, ")")
-            return True, a
-        elif self.function(b) == 0:
-            print("initial y value of b was ~== 0, returning b (", b, ")")
-            return True, b
+        if not cond:
+            print("No roots found on the [", a, ";", b, "] interval.")
+
+    def _initial_check(self, a, b, tolerance, check_initial):
+        if check_initial:
+            if abs(self.function(a)) <= tolerance:
+                print(f'initial y value of a was ~== 0 (with precision = {tolerance}), returning a ({a})')
+                return True, a
+            elif abs(self.function(b)) <= tolerance:
+                print(f'initial y value of b was ~== 0 (with precision = {tolerance}), returning b ({b})')
+                return True, b
         return False, 0
 
-    def bisection(self, lower, upper, max_iterations=500, tolerance=0.0001):
+    def bisection(self, lower, upper, max_iterations=500, tolerance=0.0001, check_initial=True):
         """ Finds the root of the function by the Bisection Method
         lower -- a
         upper -- b
@@ -36,26 +42,31 @@ class RootFinder:
         print(f'{"Iteration":<10} | {"a":<16} | {"Estimate":<20} | {"b":<16} | {"Error":<16}')
         print('{:-<80}'.format(""))
 
-        initial_check = self._initial_check(lower, upper, tolerance)
+        initial_check = self._initial_check(lower, upper, tolerance, check_initial)
         if initial_check[0]:
             return initial_check[1]
 
         iterations = 0
         while iterations < max_iterations:
             midpoint = (lower + upper) / 2.0
+            midpoint_y = self.function(midpoint)
             print(f'{iterations:<10} | {"%0.8f" % lower:<16} | {"%0.8f" % midpoint:<20} | {"%0.8f" % upper:<16} | '
                   f'{"%0.8f" % abs(upper - lower):<16}')
 
-            if self.function(midpoint) == 0 or abs(upper - lower) <= tolerance:
-                print("--- End of Bisection ---\n")
-                return midpoint
-            if self.function(lower) * self.function(midpoint) < 0:
+            print("f(a) * f(x) =", self.function(lower) * midpoint_y)
+            # Check if f(a) and f(x) have opposite signs
+            if self.function(lower) * midpoint_y <= 0:
                 upper = midpoint
-            elif self.function(upper) * self.function(midpoint) < 0:
-                lower = midpoint
             else:
+                lower = midpoint
+            #else midpoint_y == 0:
+            #    print("--- End of Bisection ---\n")
+            #    return midpoint
+
+            if midpoint_y == 0 or abs(upper - lower) <= tolerance:
                 print("--- End of Bisection ---\n")
                 return midpoint
+
             iterations += 1
         self.final_estimate = (lower + upper) / 2.0
         self.iterations = iterations
@@ -64,7 +75,7 @@ class RootFinder:
         print("--- End of Bisection ---\n")
         return self.final_estimate
 
-    def parabolic(self, a, b, max_iterations=50, tolerance=0.0001):
+    def parabolic(self, a, b, max_iterations=50, tolerance=0.0001, check_initial=True):
         iterations = 0
         x0 = (a + b) / 2
         self._description_line("Parabolic (Mueller's)", a, b, tolerance)
@@ -73,7 +84,7 @@ class RootFinder:
               f'{"a":<8} | {"b":<8} | {"Estimate (xi)":<20} | {"Error":<16}')
         print('{:-<136}'.format(""))
 
-        initial_check = self._initial_check(a, b, tolerance)
+        initial_check = self._initial_check(a, b, tolerance, check_initial)
         if initial_check[0]:
             return initial_check[1]
 
@@ -97,6 +108,9 @@ class RootFinder:
             elif self.function(current_x) * self.function(b) < 0:
                 a = current_x
                 b = b
+            #else:
+            #    print("--- End of Parabolic (Mueller's) ---\n")
+            #    return current_x
 
             # Chose more appropriate root
             if a <= root_1 <= b or a >= root_1 >= b:
