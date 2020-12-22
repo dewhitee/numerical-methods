@@ -38,10 +38,14 @@ class RootFinder:
         lower -- a
         upper -- b
         """
-        self._description_line("Bisection", lower, upper, tolerance)
-        print(f'{"Iteration":<10} | {"a":<16} | {"Estimate":<20} | {"b":<16} | {"Error":<16}')
-        print('{:-<80}'.format(""))
 
+        # Step 1 - Print available info, checking root condition f(a) * f(b) <= 0
+        self._description_line("Bisection", lower, upper, tolerance)
+        print(f'{"Iteration":<10} | {"a":<16} | {"Estimate":<20} | {"b":<16} | {"Error":<16} | {"f(a) * f(x)":<16}')
+        print('{:-<100}'.format(""))
+
+        # (Modification) check for initial value of f(a) and f(b). If one of them is ~= 0 (with tolerance) then
+        # return corresponding x value
         initial_check = self._initial_check(lower, upper, tolerance, check_initial)
         if initial_check[0]:
             return initial_check[1]
@@ -51,18 +55,15 @@ class RootFinder:
             midpoint = (lower + upper) / 2.0
             midpoint_y = self.function(midpoint)
             print(f'{iterations:<10} | {"%0.8f" % lower:<16} | {"%0.8f" % midpoint:<20} | {"%0.8f" % upper:<16} | '
-                  f'{"%0.8f" % abs(upper - lower):<16}')
+                  f'{"%0.8f" % abs(upper - lower):<16} | {"%0.8f" % (self.function(lower) * midpoint_y):<16}')
 
-            print("f(a) * f(x) =", self.function(lower) * midpoint_y)
             # Check if f(a) and f(x) have opposite signs
             if self.function(lower) * midpoint_y <= 0:
                 upper = midpoint
             else:
                 lower = midpoint
-            #else midpoint_y == 0:
-            #    print("--- End of Bisection ---\n")
-            #    return midpoint
 
+            # Checking if current error is less than tolerance
             if midpoint_y == 0 or abs(upper - lower) <= tolerance:
                 print("--- End of Bisection ---\n")
                 return midpoint
@@ -77,13 +78,20 @@ class RootFinder:
 
     def parabolic(self, a, b, max_iterations=50, tolerance=0.0001, check_initial=True):
         iterations = 0
-        x0 = (a + b) / 2
+
+        # Step 1 - Print available info, checking root condition f(a) * f(b) <= 0
         self._description_line("Parabolic (Mueller's)", a, b, tolerance)
+
+        # Step 2 - Initializing initial x
+        x0 = (a + b) / 2
+
         print("Initial x's =", a, ",", x0, ",", b)
         print(f'{"Iteration":<10} | {"a0":<8} | {"a1":<8} | {"a2":<8} | {"Root 1":<12} | {"Root 2":<12} | '
               f'{"a":<8} | {"b":<8} | {"Estimate (xi)":<20} | {"Error":<16}')
         print('{:-<136}'.format(""))
 
+        # (Modification) check for initial value of f(a) and f(b). If one of them is ~= 0 (with tolerance) then
+        # return corresponding x value
         initial_check = self._initial_check(a, b, tolerance, check_initial)
         if initial_check[0]:
             return initial_check[1]
@@ -91,28 +99,27 @@ class RootFinder:
         current_x = x0
         prev_x = 0.0
         while iterations < max_iterations:
-            # Step 3 - get Y values from X ---
+            # Step 3.1 - get Y values from X ---
             xs = [a, current_x, b]
             ys = [self.function(a), self.function(x0), self.function(b)]
 
-            # Step 3 - get coefficients of a quadratic function ---
-            a0, a1, a2 = self.get_coefficients_lagrange(xs, ys)
+            # Step 3.2 - get coefficients of a quadratic function using lagrange or other method ---
+            a0, a1, a2 = self._get_coefficients(xs, ys)
 
-            # Step 4 - solving quadratic equation ---
-            root_1, root_2 = self.solve_quadratic_equation(a0, a1, a2, current_x)
+            # Step 4.1 - solving quadratic equation ---
+            root_1, root_2 = self._solve_quadratic_equation(a0, a1, a2, current_x)
 
-            # Update boundaries
+            # Step 4.2 - Update boundaries
+            # If the f(a) * f(x) < 0    => set right border to x
+            # If the f(b) * f(x) < 0    => set left border to x
             if self.function(a) * self.function(current_x) < 0:
                 a = a
                 b = current_x
             elif self.function(current_x) * self.function(b) < 0:
                 a = current_x
                 b = b
-            #else:
-            #    print("--- End of Parabolic (Mueller's) ---\n")
-            #    return current_x
 
-            # Chose more appropriate root
+            # Step 4.3 - Chose more appropriate root (new approximation of x) that belongs to the current [a; b] interval
             if a <= root_1 <= b or a >= root_1 >= b:
                 current_x = root_1
             elif a <= root_2 <= b or a >= root_2 >= b:
@@ -123,16 +130,19 @@ class RootFinder:
                   f'{"%0.4f" % a:<8} | {"%0.4f" % b:<8} | {"%0.8f" % current_x:<20} | '
                   f'{"%0.8f" % abs(current_x - prev_x):<16}')
 
+            # Step 5 - checking error
             if abs(current_x - prev_x) <= tolerance:
                 print("--- End of Parabolic (Mueller's) ---\n")
                 return current_x
 
+            # Set current root as the previous root
             prev_x = current_x
             iterations += 1
+
         print("--- End of Parabolic (Mueller's) ---\n")
         return current_x
 
-    def get_coefficients_lagrange(self, x, y):
+    def _get_coefficients(self, x, y):
         #print("(", x[0], "-", x[1], ") * (", x[0], "-", x[1], ") * (", x[1], "—", x[2], ") =",
         #      (x[0] - x[1]) * (x[0] - x[2]) * (x[1] - x[2]))
         #denom = (x[0] - x[1]) * (x[0] - x[2]) * (x[1] - x[2])
@@ -165,7 +175,7 @@ class RootFinder:
         return a, b, c
 
 
-    def solve_quadratic_equation(self, a, b, c, x):
+    def _solve_quadratic_equation(self, a, b, c, x):
         """ Returns roots of the quadratic equation.
         (-a1 +- sqrt(a1^2 - 4*a0*a2)) / 2a2
         """

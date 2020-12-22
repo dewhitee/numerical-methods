@@ -16,6 +16,15 @@ class DifferentialEquationsSolver:
     def compare_errors(approx_ys, exact_ys):
         return [abs(y2 - y1) for y1, y2 in zip(approx_ys[1:], exact_ys[1:])]
 
+    @staticmethod
+    def get_global_errors(errors):
+        sum = 0
+        global_errors = []
+        for e in errors:
+            sum += e
+            global_errors.append(sum)
+        return global_errors
+
     def _get_next_y(self, current_x, current_y):
         return self.function(current_x, current_y)
 
@@ -45,6 +54,7 @@ class DifferentialEquationsSolver:
                   f'{"%0.8f" % error:<16}')
 
     def get_xy(self, initial_x, initial_y, last_x):
+        # Initializing vector of xs with values from initial_x until last_x + step
         xs = np.arange(initial_x, last_x + self.step_h, self.step_h)
         ys = []
         current_y = initial_y
@@ -79,13 +89,17 @@ class RungeKutta(DifferentialEquationsSolver):
         self.method_name = "Runge Kutta"
 
     def _get_next_y(self, current_x, current_y):
+        # Using Simpson's integration formula
         adjusted_step_h = self.step_h / 2
         f1_left_point = self.function(
             current_x, current_y)
+        # Calculating with Euler method
         f2_central_point_euler = self.function(
             current_x + adjusted_step_h, current_y + adjusted_step_h * f1_left_point)
+        # Correction
         f3_central_point_adjusted = self.function(
             current_x + adjusted_step_h, current_y + adjusted_step_h * f2_central_point_euler)
+        # Prediction to the full step
         f4_right_point = self.function(
             current_x + self.step_h, current_y + self.step_h * f3_central_point_adjusted)
         return current_y + (self.step_h / 6) * (

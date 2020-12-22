@@ -16,7 +16,8 @@ funcs = [
     lambda x, y: -3*y + 2*(x ** 2),
     lambda x, y: 0.9*y - 0.2*(y ** 2),
     lambda x, y: y,
-    lambda x, y: y**2
+    lambda x, y: y**2,
+    lambda x, y: math.sin(x) ** 2 * y
 ]
 y2_exact = [13, 6.15, 2.96, 1.54, 1.01]
 
@@ -134,5 +135,18 @@ plt.legend(
 )
 plt.show()
 
-
+xy8_eu = de.Euler(funcs[4], 0.25).get_xy(0, 1, 5)
+xy8_rk = de.RungeKutta(funcs[4], 0.25).get_xy(0, 1, 5)
+plt.plot(
+    xy8_eu[0], xy8_eu[1], "g--",
+    xy8_rk[0], xy8_rk[1], "b--",
+)
+plt.legend(
+    [
+        "Euler (0.25)",
+        "Runge Kutta (0.25)",
+        "Exact"
+    ]
+)
+plt.show()
 
