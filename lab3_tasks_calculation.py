@@ -108,6 +108,6 @@ print("My bisection 3 =", roots.RootFinder(funcs[1], None).bisection(
 
 f2 = lambda x: (x ** 3) + 2 * (x ** 2) + 10*x - 20
 print("My parabolic 4 =", roots.RootFinder(f2, None).parabolic(
-    a=0, b=2, tolerance=0.001))
+    a=0, b=2, tolerance=0.0001))
 print("My bisection 4 =", roots.RootFinder(f2, None).bisection(
-    lower=0, upper=2, tolerance=0.001))
+    lower=0, upper=2, tolerance=0.0001))

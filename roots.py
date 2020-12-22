@@ -5,7 +5,7 @@ from numpy.polynomial.polynomial import Polynomial
 
 
 class RootFinder:
-    def __init__(self, function, solution_vectorX):
+    def __init__(self, function, solution_vectorX=None):
         self.function = function
         self.solvec = solution_vectorX
         self.final_estimate = 0
@@ -109,7 +109,7 @@ class RootFinder:
             # Step 4.1 - solving quadratic equation ---
             root_1, root_2 = self._solve_quadratic_equation(a0, a1, a2, current_x)
 
-            # Step 4.2 - Update boundaries
+            # Step 4.2 - Update boundaries (checking for opposite signs)
             # If the f(a) * f(x) < 0    => set right border to x
             # If the f(b) * f(x) < 0    => set left border to x
             if self.function(a) * self.function(current_x) < 0:
@@ -166,8 +166,6 @@ class RootFinder:
 
         delta1 = (self.function(x[2]) - self.function(x[0])) / h1
         delta2 = (self.function(x[1]) - self.function(x[2])) / h2
-
-        #print("delta2 =", delta2, ", delta1 =", delta1, ", h2 =", h2, ", h1 =", h1)
 
         a = (delta2 - delta1) / (h2 + h1)
         b = a * h2 + delta2
