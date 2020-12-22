@@ -11,15 +11,15 @@ funcs = [
 ]
 
 
-def testing(function, x1, x2):
+def testing(function, x1, x2, formula):
     rf = roots.RootFinder(function, None)
     rf_bis = rf.bisection(x1, x2, max_iterations=200)
     rf_parab = rf.parabolic(x1, x2, max_iterations=200)
     # print("Bisection =", '%0.5f' % rf_bis)
     # print("Parabolic =", '%0.5f' % rf_parab)
 
-    plt.figure("Parabolic v Bisection")
-    plt.title("Parabolic v Bisection")
+    plt.figure("Parabolic v Bisection " + formula)
+    plt.title("Parabolic v Bisection " + formula)
     plt.plot(
         [x1, x2],
         [rf.function(x1), rf.function(x2)],
@@ -55,9 +55,9 @@ def testing(function, x1, x2):
     plt.show()
 
 
-testing(funcs[0], -1.5, 3)
-testing(funcs[1], -24, 2)
-testing(funcs[2], 0.05, 2)
+testing(funcs[0], -1.5, 3, "x / (x + 3) ** 3")
+testing(funcs[1], -24, 2, "2 ** (3 * x)")
+testing(funcs[2], 0.05, 2, "math.sqrt(4 - x ** 2) / x")
 
 f1 = lambda x: x**2 - x - 1
 print("Bisection =", roots.RootFinder(f1, None).bisection(lower=1, upper=2))

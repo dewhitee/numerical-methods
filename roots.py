@@ -19,10 +19,10 @@ class RootFinder:
               "< 0)")
 
     def _initial_check(self, a, b, tolerance):
-        if abs(self.function(a) - 0) <= tolerance:
+        if self.function(a) == 0:
             print("initial y value of a was ~== 0, returning a (", a, ")")
             return True, a
-        elif abs(self.function(b) - 0) <= tolerance:
+        elif self.function(b) == 0:
             print("initial y value of b was ~== 0, returning b (", b, ")")
             return True, b
         return False, 0
@@ -33,7 +33,7 @@ class RootFinder:
         upper -- b
         """
         self._description_line("Bisection", lower, upper, tolerance)
-        print(f'{"Iteration":<10} | {"Estimate":<20} | {"Error":<16}')
+        print(f'{"Iteration":<10} | {"a":<16} | {"Estimate":<20} | {"b":<16} | {"Error":<16}')
         print('{:-<80}'.format(""))
 
         initial_check = self._initial_check(lower, upper, tolerance)
@@ -43,7 +43,8 @@ class RootFinder:
         iterations = 0
         while iterations < max_iterations:
             midpoint = (lower + upper) / 2.0
-            print(f'{iterations:<10} | {"%0.8f" % midpoint:<20} | {"%0.8f" % abs(upper - lower):<16}')
+            print(f'{iterations:<10} | {"%0.8f" % lower:<16} | {"%0.8f" % midpoint:<20} | {"%0.8f" % upper:<16} | '
+                  f'{"%0.8f" % abs(upper - lower):<16}')
 
             if self.function(midpoint) == 0 or abs(upper - lower) <= tolerance:
                 print("--- End of Bisection ---\n")
@@ -52,10 +53,14 @@ class RootFinder:
                 upper = midpoint
             elif self.function(upper) * self.function(midpoint) < 0:
                 lower = midpoint
+            else:
+                print("--- End of Bisection ---\n")
+                return midpoint
             iterations += 1
         self.final_estimate = (lower + upper) / 2.0
         self.iterations = iterations
-        print(f'{iterations:<10} | {"%0.8f" % self.final_estimate:<20} | {"%0.8f" % abs(upper - lower):<16}')
+        print(f'{iterations:<10} | {"%0.8f" % lower:<16} | {"%0.8f" % self.final_estimate:<20} | '
+              f'{"%0.8f" % upper:<16} | {"%0.8f" % abs(upper - lower):<16}')
         print("--- End of Bisection ---\n")
         return self.final_estimate
 
