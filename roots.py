@@ -12,11 +12,20 @@ class RootFinder:
         self.iterations = 0
 
     def _description_line(self, method_name, a, b, tolerance):
-        print(f'\n--- {method_name} ---\nTolerance =', tolerance, ", Root condition (f(a) * f(b) <= 0) =",
-              self.function(a) * self.function(b) <= 0, "(",
+        print(f'\n--- {method_name} ---\nTolerance =', tolerance, ", Root condition (f(a) * f(b) < 0) =",
+              self.function(a) * self.function(b) < 0, "(",
               f'{"%0.5f" % self.function(a)} * {"%0.5f" % self.function(b)} = '
               f'{"%0.5f" % (self.function(a) * self.function(b))}',
-              "<= 0)")
+              "< 0)")
+
+    def _initial_check(self, a, b, tolerance):
+        if abs(self.function(a) - 0) <= tolerance:
+            print("initial y value of a was ~== 0, returning a (", a, ")")
+            return True, a
+        elif abs(self.function(b) - 0) <= tolerance:
+            print("initial y value of b was ~== 0, returning b (", b, ")")
+            return True, b
+        return False, 0
 
     def bisection(self, lower, upper, max_iterations=500, tolerance=0.0001):
         """ Finds the root of the function by the Bisection Method
@@ -27,26 +36,26 @@ class RootFinder:
         print(f'{"Iteration":<10} | {"Estimate":<20} | {"Error":<16}')
         print('{:-<80}'.format(""))
 
+        initial_check = self._initial_check(lower, upper, tolerance)
+        if initial_check[0]:
+            return initial_check[1]
+
         iterations = 0
         while iterations < max_iterations:
             midpoint = (lower + upper) / 2.0
+            print(f'{iterations:<10} | {"%0.8f" % midpoint:<20} | {"%0.8f" % abs(upper - lower):<16}')
 
-            if midpoint == 0 or abs(upper - lower) <= tolerance:
-                print(f'{iterations:<10} | {"%0.8f" % midpoint:<20} | {"%0.8f" % abs(upper - lower):<16}')
+            if self.function(midpoint) == 0 or abs(upper - lower) <= tolerance:
                 print("--- End of Bisection ---\n")
                 return midpoint
-            #if self.function(self.solvec, midpoint) > 0:
-            if self.function(midpoint) * self.function(lower) <= 0:
+            if self.function(lower) * self.function(midpoint) < 0:
                 upper = midpoint
-            else:
+            elif self.function(upper) * self.function(midpoint) < 0:
                 lower = midpoint
             iterations += 1
-            print(f'{iterations:<10} | {"%0.8f" % ((lower + upper) / 2.0):<20} | {"%0.8f" % abs(upper - lower):<16}')
-            #print("i =", iterations, "current estimate =", (lower + upper) / 2.0, ", error =", abs(upper - lower))
         self.final_estimate = (lower + upper) / 2.0
         self.iterations = iterations
-        #print("---\niterations =", iterations, ", final estimate =", self.final_estimate)
-        print(f'{iterations:<10} | {"%0.8f" % self.final_estimate:<16} | {"%0.8f" % abs(upper - lower):<16}')
+        print(f'{iterations:<10} | {"%0.8f" % self.final_estimate:<20} | {"%0.8f" % abs(upper - lower):<16}')
         print("--- End of Bisection ---\n")
         return self.final_estimate
 
@@ -59,10 +68,9 @@ class RootFinder:
               f'{"a":<8} | {"b":<8} | {"Estimate (xi)":<20} | {"Error":<16}')
         print('{:-<136}'.format(""))
 
-        if self.function(a) == 0:
-            return a
-        elif self.function(b) == 0:
-            return b
+        initial_check = self._initial_check(a, b, tolerance)
+        if initial_check[0]:
+            return initial_check[1]
 
         current_x = x0
         prev_x = 0.0

@@ -58,3 +58,6 @@ def testing(function, x1, x2):
 testing(funcs[0], -1.5, 3)
 testing(funcs[1], -24, 2)
 testing(funcs[2], 0.05, 2)
+
+f1 = lambda x: x**2 - x - 1
+print("Bisection =", roots.RootFinder(f1, None).bisection(lower=1, upper=2))
