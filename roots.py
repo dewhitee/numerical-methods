@@ -180,11 +180,13 @@ class RootFinder:
         #return (-c1 + math.sqrt(c1 ** 2 - 4 * c0 * c2)) / 2 * c2, (-c1 - math.sqrt(c1 ** 2 - 4 * c0 * c2)) / 2 * c2
         return x + (-2*c)/(b + math.sqrt(b ** 2 - 4*a*c)), x + (-2*c)/(b - math.sqrt(b ** 2 - 4*a*c))
 
-    def secant(self, lower_approx_x, upper_approx_x, max_iterations=500, tolerance=0.0001):
-        exit
-        #iterations = 1
-        #while iterations < max_iterations and abs(upper_approx_x - lower_approx_x) > tolerance:
-        #    out_x = upper_approx_x - (self.function())
+    def secant(self, a, b, max_iterations=500, tolerance=0.0001):
+        self._description_line("Secant", a, b, tolerance)
+        iterations = 0
+        condition = True
+        #while condition:
+        #    if self.function()
+
 
     #def brent(self, )
 

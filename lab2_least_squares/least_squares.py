@@ -60,7 +60,7 @@ class LeastSquaresApproximator:
 
         if not without_print:
             print("solution_vectorX (a coefficients) =", self.solution_vectorX)
-            print("vectorX[0] =",self.vectorX[0])
+            print("vectorX[0] =", self.vectorX[0])
 
         # Initializing vectorF and vector_deltaF as empty lists
         self.vectorF = []
@@ -202,13 +202,16 @@ class LeastSquaresApproximator:
     def make_plot(self):
         plt.figure("Least Squares by dewhitee")
         plt.title("Least Squares approximation with k = " + str(self.k_approx_order))
-        plt.plot(self.vectorX, self.vectorY, 'bs', self.vectorX, self.vectorF, 'g--', self.vectorX, self.vectorF, 'g^')
+        #plt.plot(self.vectorX, self.vectorY, 'bs', self.vectorX, self.vectorF, 'g--', self.vectorX, self.vectorF, 'g^')
+        plt.plot(self.vectorX, self.vectorY, 'bs', self.vectorX, self.vectorF, 'g^')
         plt.plot(self.interpolated_vectorX, self.interpolated_vectorY, 'y--')
         plt.xlabel("X values")
         plt.ylabel("Y values")
         for i in range(0, len(self.vectorX) - 1):
             plt.plot([self.vectorX[i], self.vectorX[i]], [self.vectorY[i], self.vectorF[i]], 'r--')
         plt.plot([self.vectorX[-1], self.vectorX[-1]], [self.vectorY[-1], self.vectorF[-1]], 'r--')
+        plt.grid()
+        plt.legend(["Known points", "Calculated points", "Interpolated", "Distance to calculated"])
         plt.show()
 
     def get_power_basis_matrix(self):

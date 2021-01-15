@@ -51,12 +51,15 @@ class GaussElimination:
             # Iterating as columns
             for k in range(i + 1, self.matrix_len):
                 # Dividing k-th row i-th element by the current main diagonal element
-                coefficient = matrix_copy[k][i] / matrix_copy[i][i] # Coefficient
+                coefficient = matrix_copy[k][i] / matrix_copy[i][i]  # Coefficient
+                print(f'Coefficient ({coefficient}) =", {matrix_copy[k][i]} / {matrix_copy[i][i]}')
         
                 # Make the elements below the pivot elements equal to zero or eliminate the variables
                 # Iterating all elements of rows (including the vectorB)
                 for j in range(0, self.matrix_len + 1):
+                    print(f'{j}-th element of {k}-th row ({matrix_copy[k][j]}) -= {coefficient} * {matrix_copy[i][j]}')
                     matrix_copy[k][j] -= coefficient * matrix_copy[i][j]
+                    print(f'{j}-th element of {k}-th row = {matrix_copy[k][j]}')
 
         if not without_print and not print_only_results:
             print('\nMatrix after gauss elimination:\n')
@@ -84,7 +87,7 @@ class GaussElimination:
         if not without_print and print_results:
             print('\nSolution:')
             for (var, val) in zip(vars, vars_values):
-                print(var, '= %0.4f' %(val))
+                print(var, '= %0.4f' % val)
             print('-------------------------------------\n')
 
         self.vars_values = vars_values
