@@ -187,6 +187,29 @@ class RootFinder:
         #while condition:
         #    if self.function()
 
+    def fixed_point_iteration(self, x0, e, N, gfunc):
+        print('\n\n*** FIXED POINT ITERATION ***')
+        step = 1
+        flag = 1
+        condition = True
+        while condition:
+            x1 = gfunc(x0)
+            print('Iteration-%d, x1 = %0.6f and f(x1) = %0.6f' % (step, x1, self.function(x1)))
+            x0 = x1
+
+            step = step + 1
+
+            if step > N:
+                flag = 0
+                break
+
+            condition = abs(self.function(x1)) > e
+
+        if flag == 1:
+            print('\nRequired root is: %0.8f' % x1)
+        else:
+            print('\nNot Convergent.')
+
 
     #def brent(self, )
 

@@ -8,15 +8,6 @@ funcs = [
     lambda x: (x ** 2) * math.sin(x ** 2)
 ]
 
-fxs = [
-    funcs[0](0.4),
-    funcs[0](0.8),
-    funcs[0](1.2),
-    funcs[0](1.6),
-    funcs[0](2)
-]
-print("fxs:", fxs)
-
 def cals(fid, a, b, h):
     def right_rectangle(f, x):
         return f(x) * h
@@ -33,12 +24,26 @@ def cals(fid, a, b, h):
     def largef(f, x_prev, si):
         return f(x_prev) + si
 
+    x_1 = a - h
     x0 = a
     x1 = a + h
     x2 = a + h + h
     x3 = a + h + h + h
     x4 = a + h + h + h + h
     x5 = a + h + h + h + h + h
+    x6 = a + h + h + h + h + h + h
+
+    fxs = [
+        funcs[fid](x_1),
+        funcs[fid](x0),
+        funcs[fid](x1),
+        funcs[fid](x2),
+        funcs[fid](x3),
+        funcs[fid](x4),
+        funcs[fid](x5),
+        funcs[fid](x6)
+    ]
+    print("fxs:", fxs)
 
     rrect_fxs = [
         right_rectangle(funcs[fid], x0),
@@ -69,17 +74,19 @@ def cals(fid, a, b, h):
     #print("simp fxs:", simp_fxs, "| simp sum =", sum(simp_fxs))
 
     f_derivxs = [
-        0,
+        deriv(funcs[fid], x_1, x1),
+        #0,
         deriv(funcs[fid], x0, x2),
         deriv(funcs[fid], x1, x3),
         deriv(funcs[fid], x2, x4),
         deriv(funcs[fid], x3, x5),
-        0
+        #0
+        deriv(funcs[fid], x4, x6),
     ]
     print("deriv fxs:", f_derivxs)
 
     f_largexs = [
-        0,
+        #0,
         trap_fxs[0],
         trap_fxs[0] + trap_fxs[1],
         trap_fxs[0] + trap_fxs[1] + trap_fxs[2],
@@ -90,6 +97,8 @@ def cals(fid, a, b, h):
 
 #cals(fid=0, a=0, b=2)
 cals(fid=0, a=0, b=2, h=0.4)
+print("\n")
+cals(fid=3, a=0, b=1, h=0.2)
 
 #rrect_fxs = [
 #    right_rectangle(funcs[0], x0),
