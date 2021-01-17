@@ -5,7 +5,8 @@ funcs = [
     lambda x: (x / (x + 3) ** 3),
     lambda x: (x / (x + 3) ** 3) - 33,
     lambda x: (x ** 2) / (math.sqrt(2*x + 1)),
-    lambda x: (x ** 2) * math.sin(x ** 2)
+    lambda x: (x ** 2) * math.sin(x ** 2),
+    lambda x: math.sqrt(4 - x ** 2) / x
 ]
 
 def cals(fid, a, b, h):
@@ -64,14 +65,14 @@ def cals(fid, a, b, h):
     ]
     print("trap fxs:", trap_fxs, "| trap sum =", sum(trap_fxs))
 
-    #simp_fxs = [
-    #    simpsons(funcs[fid], x0, x1, x2),
-    #    simpsons(funcs[fid], x1, x2, x3),
-    #    simpsons(funcs[fid], x2, x3, x4),
-    #    simpsons(funcs[fid], x3, x4, x5),
-    #    simpsons(funcs[fid], x4, x5, x5 + h),
-    #]
-    #print("simp fxs:", simp_fxs, "| simp sum =", sum(simp_fxs))
+    simp_fxs = [
+        simpsons(funcs[fid], x_1, x0, x1),
+        simpsons(funcs[fid], x0, x1, x2),
+        simpsons(funcs[fid], x1, x2, x3),
+        simpsons(funcs[fid], x2, x3, x4),
+        simpsons(funcs[fid], x3, x4, x5),
+    ]
+    print("simp fxs:", simp_fxs, "| simp sum =", sum(simp_fxs))
 
     f_derivxs = [
         deriv(funcs[fid], x_1, x1),
@@ -87,6 +88,7 @@ def cals(fid, a, b, h):
 
     f_largexs = [
         #0,
+        trapezoidal(funcs[fid], x_1, x0),
         trap_fxs[0],
         trap_fxs[0] + trap_fxs[1],
         trap_fxs[0] + trap_fxs[1] + trap_fxs[2],
@@ -99,6 +101,8 @@ def cals(fid, a, b, h):
 cals(fid=0, a=0, b=2, h=0.4)
 print("\n")
 cals(fid=3, a=0, b=1, h=0.2)
+print("\n")
+cals(fid=4, a=0.2, b=1, h=0.16)
 
 #rrect_fxs = [
 #    right_rectangle(funcs[0], x0),
@@ -139,3 +143,8 @@ roots.RootFinder(
 #roots.RootFinder(
 #    function=lambda x: (x ** 2) * math.sin(x ** 2) - 33,
 #).bisection(0, 1)
+
+simp = (funcs[0](0) + 4 * funcs[0](0.4) + funcs[0](0.8)) * (0.4/6)
+dsimp = (funcs[3](0) + 4 * funcs[3](0.2) + funcs[3](0.4)) * (0.2/6)
+print(simp)
+print(dsimp)

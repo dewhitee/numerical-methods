@@ -2,8 +2,8 @@ import lab1_gauss_elimination.gauss_elimination as ge
 
 ng = 33
 ns = 14
-#ns = 15  # eugene
-j = 1
+#ns = 15
+j = 0
 
 a11 = (ng + 4) + j*5
 a12 = -3 - j*4
@@ -27,12 +27,12 @@ matrix = [
     [a31, a32, a33, b3]
 ]
 
-ge.GaussElimination(
+print(ge.GaussElimination(
     matrixAB=matrix,
     vars=['x1', 'x2', 'x3'],
     print_only_results=False,
     matrix_name="First task matrix"
-)
+).solution_vectorX)
 
 matrix_2 = [
     [42, -7, 0, 9],

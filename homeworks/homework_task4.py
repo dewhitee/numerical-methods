@@ -10,7 +10,7 @@ import math
 
 roots.RootFinder(lambda x: (x / (x + 3) ** 3) - 33).bisection(a, b, tolerance=0.00001)
 #roots.RootFinder(lambda x: (x ** 2) * math.sin(x ** 2) - 33).bisection(-7, 8, tolerance=0.0001)
-
+roots.RootFinder(lambda x: math.sqrt(4 - x ** 2)/x - 33).bisection(0.05, 0.07)
 
 def initf(x):
     return (x / (x + 3) ** 3)
